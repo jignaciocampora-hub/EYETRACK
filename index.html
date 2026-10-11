@@ -310,6 +310,7 @@ function loop(){
   const now = performance.now();
   let res; try { res = S.lm.detectForVideo(cam, now); } catch(e){ return; }
   const f = extract(res);
+  S.lastF=f; S.lastFT=now;
   if(S.collect && f && now>=S.collect.from) S.collect.arr.push(f);
   if(S.mode==='test') recordTest(f, now);
   else if(S.mode==='live') moveDot(gaze(f, now));
@@ -355,16 +356,20 @@ function drawPreview(res, f){
 }
 
 /* ================= modelo de mirada ================= */
-const FLOOR=[.02,.02,.005,.005,.005,.03,.03,.02,.02,.01];
-const feat = f => [f.h, f.v, f.h*f.h, f.v*f.v, f.h*f.v, f.yaw, f.pitch, f.nx, f.ny, f.scale];
-function train(samples){
-  const X=samples.map(s=>feat(s.f)), d=X[0].length, n=X.length;
+const FSETS = {
+  A: { name:'ojos (lineal)', f:f=>[f.h,f.v], floor:[.02,.02] },
+  B: { name:'ojos (curvo)', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v], floor:[.02,.02,.005,.005,.005] },
+  C: { name:'ojos + giro de cabeza', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v,f.yaw,f.pitch], floor:[.02,.02,.005,.005,.005,.03,.03], head:true },
+  D: { name:'ojos + cabeza completa', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v,f.yaw,f.pitch,f.nx,f.ny,f.scale], floor:[.02,.02,.005,.005,.005,.03,.03,.02,.02,.01], head:true },
+};
+function train(samples, fs='D', lam=0.01){
+  const F=FSETS[fs], X=samples.map(s=>F.f(s.f)), d=X[0].length, n=X.length;
   const mu=Array(d).fill(0), sd=Array(d).fill(0);
   X.forEach(x=>x.forEach((v,j)=>mu[j]+=v/n));
   X.forEach(x=>x.forEach((v,j)=>sd[j]+=(v-mu[j])**2/n));
-  for(let j=0;j<d;j++) sd[j]=Math.max(Math.sqrt(sd[j]), FLOOR[j]);
+  for(let j=0;j<d;j++) sd[j]=Math.max(Math.sqrt(sd[j]), F.floor[j]);
   const Z=X.map(x=>[1, ...x.map((v,j)=>(v-mu[j])/sd[j])]);
-  return { mu, sd, wx:ridge(Z, samples.map(s=>s.x), 0.01), wy:ridge(Z, samples.map(s=>s.y), 0.01) };
+  return { fs, lam, mu, sd, wx:ridge(Z, samples.map(s=>s.x), lam), wy:ridge(Z, samples.map(s=>s.y), lam) };
 }
 function ridge(Z,y,lam){
   const n=Z.length, d=Z[0].length, A=[...Array(d)].map(()=>Array(d).fill(0)), b=Array(d).fill(0);
@@ -382,14 +387,15 @@ function solve(A,b){
   return M.map((r,i)=>r[n]/(r[i]||1e-12));
 }
 function predictWith(m,f){
-  const z=[1, ...feat(f).map((v,j)=>(v-m.mu[j])/m.sd[j])];
+  const z=[1, ...FSETS[m.fs].f(f).map((v,j)=>(v-m.mu[j])/m.sd[j])];
   let x=0,y=0; for(let i=0;i<z.length;i++){ x+=m.wx[i]*z[i]; y+=m.wy[i]*z[i]; }
   return {x,y};
 }
+S.offset={x:0,y:0};
 function gaze(f, now){
   if(!f || !isOpen(f) || !S.model) return null;
   const r=predictWith(S.model,f);
-  return { x:S.filt.x.f(r.x, now/1000), y:S.filt.y.f(r.y, now/1000) };
+  return { x:S.filt.x.f(r.x-S.offset.x, now/1000), y:S.filt.y.f(r.y-S.offset.y, now/1000) };
 }
 function moveDot(p){
   const d=$('gazeDot'); d.style.display='block';
@@ -399,8 +405,8 @@ function moveDot(p){
 const gazeTol = () => Math.max(150, (S.calErr||80)*1.5);
 
 /* ================= calibración ================= */
-const CAL=[[.06,.08],[.5,.08],[.94,.08],[.94,.5],[.5,.5],[.06,.5],[.06,.92],[.5,.92],[.94,.92]];
-const VAL=[[.28,.3],[.72,.3],[.72,.7],[.28,.7]];
+const CAL=[[.06,.08],[.5,.08],[.94,.08],[.94,.5],[.5,.5],[.06,.5],[.06,.92],[.5,.92],[.94,.92],[.27,.29],[.73,.29],[.73,.71],[.27,.71]];
+const VAL=[[.18,.42],[.82,.42],[.82,.8],[.18,.8]];
 
 function tapToContinue(el, html){
   return new Promise(r=>{
@@ -410,11 +416,32 @@ function tapToContinue(el, html){
     ov.addEventListener('pointerup',h); S.wake=done;
   });
 }
-async function target(ov,x,y,dur=1500,skip=600){
+async function target(ov,x,y,dur=1800,skip=700){
   const d=document.createElement('div'); d.className='target'; d.style.left=x+'px'; d.style.top=y+'px'; ov.appendChild(d);
   await sleep(30); d.style.transform='scale(.45)';
   const arr=[]; S.collect={from:performance.now()+skip, arr};
   await sleep(dur); S.collect=null; d.remove(); return arr;
+}
+function cleanPoint(frames){
+  if(frames.length<6) return frames;
+  const mh=median(frames.map(f=>f.h)), mv=median(frames.map(f=>f.v));
+  const dh=(median(frames.map(f=>Math.abs(f.h-mh)))||1e-3)*1.4826*3, dv=(median(frames.map(f=>Math.abs(f.v-mv)))||1e-3)*1.4826*3;
+  return frames.filter(f=>Math.abs(f.h-mh)<=dh && Math.abs(f.v-mv)<=dv);
+}
+function selectModel(groups, extra){
+  let best=null;
+  for(const fs of ['A','B','C','D']) for(const lam of [0.003,0.03,0.3]){
+    const errs=[];
+    for(let i=0;i<groups.length;i++){
+      const tr=[]; groups.forEach((g,j)=>{ if(j!==i) g.frames.forEach(f=>tr.push({f,x:g.x,y:g.y})); });
+      if(FSETS[fs].head) extra.forEach(s=>tr.push(s));
+      if(tr.length<20 || !groups[i].frames.length) continue;
+      const m=train(tr,fs,lam), ps=groups[i].frames.map(f=>predictWith(m,f));
+      errs.push(Math.hypot(median(ps.map(p=>p.x))-groups[i].x, median(ps.map(p=>p.y))-groups[i].y));
+    }
+    const e=mean(errs); if(e!=null && (!best || e<best.e)) best={fs,lam,e};
+  }
+  return best || {fs:'B',lam:0.03,e:null};
 }
 function setCal(cls, txt){ $('calStatus').innerHTML=`<span class="${cls}">${txt}</span>`; refreshButtons(); }
 function refreshButtons(){
@@ -427,34 +454,102 @@ function refreshButtons(){
   $('btnRaw').disabled = $('btnSum').disabled = !S.trials.length;
 }
 
+/* asistente previo: chequea rostro, distancia, centrado, cabeza y luz */
+function calAssistant(){
+  return new Promise(res=>{
+    const msg=$('calMsg');
+    msg.innerHTML=`<div style="font-size:22px;font-weight:700;margin-bottom:6px">Preparación</div>
+      <canvas id="calPrev" width="320" height="180" style="width:320px;max-width:80vw;border-radius:10px;background:#000;display:block;margin:0 auto 10px"></canvas>
+      <div id="calChecks" style="text-align:left;display:inline-block;font-size:16px;line-height:1.8"></div>
+      <div class="sub" style="margin:8px 0 14px">Ojos a la altura del tercio superior de la pantalla · sin reflejos en lentes · apoyá el mentón en la mano si podés</div>
+      <button id="calGo" class="go" style="font-size:18px;padding:14px 26px">Empezar calibración</button>`;
+    const pc=$('calPrev'), px=pc.getContext('2d'); let run=true;
+    if(cam.videoWidth) pc.height=Math.round(pc.width*cam.videoHeight/cam.videoWidth);
+    const tick=()=>{
+      if(!run) return; requestAnimationFrame(tick);
+      const w=pc.width, h=pc.height;
+      px.save(); px.translate(w,0); px.scale(-1,1); px.drawImage(cam,0,0,w,h); px.restore();
+      const f=S.lastF && performance.now()-S.lastFT<500 ? S.lastF : null;
+      let light=null;
+      if(f){ try{ const cx=(1-f.nx)*w, cy=f.ny*h, s=Math.max(10,f.scale*w*0.5); const d=px.getImageData(Math.max(0,cx-s),Math.max(0,cy-s),Math.min(w,2*s),Math.min(h,2*s)).data; let L=0; for(let i=0;i<d.length;i+=16) L+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; light=L/(d.length/16); }catch(e){} }
+      const ck=[
+        ['Rostro detectado', !!f],
+        ['Distancia (40–60 cm)', f && f.scale>=0.18 && f.scale<=0.45, f ? (f.scale<0.18?'acercate':f.scale>0.45?'alejate':'') : ''],
+        ['Cara centrada', f && f.nx>0.33 && f.nx<0.67 && f.ny>0.25 && f.ny<0.75],
+        ['Cabeza derecha, mirando la pantalla', f && Math.abs(f.yaw)<0.18 && Math.abs(f.pitch)<0.2],
+        ['Buena luz en la cara', light!=null && light>70 && light<235, light!=null ? (light<=70?'poca luz':light>=235?'demasiada luz':'') : ''],
+      ];
+      $('calChecks').innerHTML=ck.map(([l,ok,hint])=>`<div><span style="color:${ok?'#2ea043':'#f85149'}">${ok?'✓':'✗'}</span> ${l}${!ok&&hint?` <span class="sub">(${hint})</span>`:''}</div>`).join('');
+    };
+    tick();
+    $('calGo').addEventListener('pointerup', e=>{ e.stopPropagation(); run=false; msg.innerHTML=''; res(); }, {once:true});
+  });
+}
+
+/* pantalla de resultado: dónde estaba cada punto y dónde lo estimó la app */
+function calResultScreen(val, errPx, pct, q, modelName){
+  return new Promise(res=>{
+    const ov=$('calib'), c=document.createElement('canvas'), d=devicePixelRatio||1, W=innerWidth, H=innerHeight;
+    c.width=W*d; c.height=H*d; c.style.cssText='position:absolute;inset:0;width:100%;height:100%'; ov.appendChild(c);
+    const x=c.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.fillStyle='#111'; x.fillRect(0,0,W,H);
+    val.forEach(v=>{
+      x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=2; x.beginPath(); x.moveTo(v.x,v.y); x.lineTo(v.px,v.py); x.stroke();
+      x.strokeStyle='#fff'; x.lineWidth=3; x.beginPath(); x.arc(v.x,v.y,14,0,7); x.stroke();
+      x.fillStyle='#ffd33d'; x.beginPath(); x.arc(v.px,v.py,8,0,7); x.fill();
+    });
+    const tol=errPx||0; x.strokeStyle='rgba(46,160,67,.25)'; x.setLineDash([6,6]);
+    val.forEach(v=>{ x.beginPath(); x.arc(v.x,v.y,Math.max(30,W*0.04),0,7); x.stroke(); }); x.setLineDash([]);
+    const msg=$('calMsg');
+    msg.style.top='22%';
+    msg.innerHTML=`<div style="font-size:26px;font-weight:700;color:${q[2]}">Calibración ${q[1]}</div>
+      <div class="sub" style="margin-top:6px">Error medio ≈ ${Math.round(errPx)} px · ${pct.toFixed(1)}% de la pantalla · modelo: ${modelName}</div>
+      <div class="sub" style="margin-top:4px">○ blanco = punto real · ● amarillo = dónde lo estimó la app</div>
+      ${q[0]==='badc'?'<div class="sub" style="margin-top:8px;color:#d29922">Para mejorar: más luz de frente, cabeza quieta (mentón apoyado), pantalla a 40–60 cm y mirar el centro exacto de cada punto.</div>':''}
+      <div class="row" style="justify-content:center;margin-top:16px"><button id="calRedo" class="sec" style="font-size:17px">Repetir</button><button id="calOk" class="go" style="font-size:17px">Usar esta calibración</button></div>`;
+    const done=v=>{ c.remove(); msg.innerHTML=''; msg.style.top=''; res(v); };
+    $('calRedo').addEventListener('pointerup',e=>{ e.stopPropagation(); done('redo'); },{once:true});
+    $('calOk').addEventListener('pointerup',e=>{ e.stopPropagation(); done('ok'); },{once:true});
+  });
+}
+
 $('btnCal').addEventListener('click', runCalibration);
 async function runCalibration(){
   const ov=$('calib'), msg=$('calMsg'); ov.classList.add('on');
-  await sleep(250);
-  await tapToContinue(msg,'Mantené la cabeza quieta y seguí el punto rojo <b>solo con la mirada</b>.<br><br><span class="sub">Tocá la pantalla para empezar</span>');
-  const W=innerWidth, H=innerHeight, samp=[];
-  for(const [px,py] of CAL){ const x=px*W, y=py*H; (await target(ov,x,y)).forEach(f=>samp.push({f,x,y})); }
+  await sleep(150);
+  await calAssistant();
+  await tapToContinue(msg,'Mantené la cabeza quieta y seguí el punto rojo <b>solo con la mirada</b>, mirando su centro blanco.<br><br><span class="sub">13 puntos · ~30 segundos · Tocá para empezar</span>');
+  const W=innerWidth, H=innerHeight, raw=[];
+  for(const [px,py] of CAL){ const x=px*W, y=py*H; raw.push({x,y,frames:await target(ov,x,y)}); }
   await tapToContinue(msg,'Ahora mirá fijo el punto del centro y <b>mové suavemente la cabeza</b> (arriba, abajo, a los costados) sin dejar de mirarlo.<br><br><span class="sub">Tocá para seguir</span>');
-  (await target(ov,W/2,H/2,4000,400)).forEach((f,i)=>{ if(i%2===0) samp.push({f,x:W/2,y:H/2}); });
-  if(samp.length<60){ ov.classList.remove('on'); setCal('badc','No se detectó bien el rostro. Revisá la luz y la posición y repetí.'); return; }
-  S.openMed = median(samp.map(s=>s.f.open));
-  const good = samp.filter(s=>isOpen(s.f));
-  const model = train(good);
+  const headRaw=await target(ov,W/2,H/2,3500,400);
+  const allFrames=raw.flatMap(g=>g.frames);
+  if(allFrames.length<80){ ov.classList.remove('on'); setCal('badc','No se detectó bien el rostro durante la calibración. Revisá luz y posición y repetí.'); return; }
+  S.openMed=median(allFrames.map(f=>f.open));
+  const groups=raw.map(g=>({ x:g.x, y:g.y, frames:cleanPoint(g.frames.filter(isOpen)) })).filter(g=>g.frames.length>=4);
+  const extra=headRaw.filter(isOpen).filter((f,i)=>i%2===0).map(f=>({f,x:W/2,y:H/2}));
+  msg.innerHTML='<div class="sub">Calculando el mejor modelo…</div>'; await sleep(30);
+  const best=selectModel(groups, extra);
+  const base=groups.flatMap(g=>g.frames.map(f=>({f,x:g.x,y:g.y})));
+  const trainSet=s=>FSETS[best.fs].head ? s.concat(extra) : s;
+  const model=train(trainSet(base), best.fs, best.lam);
+  msg.innerHTML='';
   await tapToContinue(msg,'Último paso: validación. Mirá los 4 puntos.<br><br><span class="sub">Tocá para seguir</span>');
-  const vs=[], errs=[];
+  const val=[], vs=[];
   for(const [px,py] of VAL){
-    const x=px*W, y=py*H, a=(await target(ov,x,y)).filter(isOpen);
-    if(a.length<5) continue;
-    const ps=a.map(f=>predictWith(model,f));
-    errs.push(Math.hypot(mean(ps.map(p=>p.x))-x, mean(ps.map(p=>p.y))-y));
-    a.forEach(f=>vs.push({f,x,y}));
+    const x=px*W, y=py*H, a=cleanPoint((await target(ov,x,y)).filter(isOpen));
+    if(a.length<4) continue;
+    const ps=a.map(f=>predictWith(model,f)), p={x:median(ps.map(q=>q.x)), y:median(ps.map(q=>q.y))};
+    val.push({x,y,px:p.x,py:p.y,err:Math.hypot(p.x-x,p.y-y)}); a.forEach(f=>vs.push({f,x,y}));
   }
-  S.model = train(good.concat(vs));
-  S.calibSize={w:W,h:H}; S.calErr = errs.length ? mean(errs) : null;
+  const err=val.length?mean(val.map(v=>v.err)):(best.e||null);
+  const pct=err!=null?100*err/Math.hypot(W,H):99;
+  const q = pct<4 ? ['ok','buena','#2ea043'] : pct<7 ? ['warnc','aceptable','#d29922'] : ['badc','mejorable','#f85149'];
+  const choice=await calResultScreen(val, err||0, pct, q, FSETS[best.fs].name);
+  if(choice==='redo'){ await sleep(100); return runCalibration(); }
+  S.model=train(trainSet(base.concat(vs)), best.fs, best.lam);
+  S.calibSize={w:W,h:H}; S.calErr=err; S.calPct=pct; S.offset={x:0,y:0};
   ov.classList.remove('on');
-  const e=S.calErr;
-  const q = e==null ? ['warnc','sin validación'] : e<70 ? ['ok','buena'] : e<120 ? ['warnc','aceptable'] : ['badc','mala, conviene repetir'];
-  setCal(q[0], `Calibración ${q[1]}` + (e!=null ? ` · error medio ≈ ${Math.round(e)} px (~${(e/52).toFixed(1)} cm en iPad)` : ''));
+  setCal(q[0], `Calibración ${q[1]} · error ≈ ${Math.round(err)} px (${pct.toFixed(1)}% de la pantalla) · modelo: ${FSETS[best.fs].name}`);
   if(S.tab==='tests') renderTestCards();
 }
 const sizeChanged = () => S.calibSize && Math.abs(S.calibSize.w-innerWidth)>40;
@@ -1178,6 +1273,13 @@ async function runVisionTest(key){
   VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
   $('vt').classList.add('on'); vtSetup(); newFilter();
   let R=null, snapTimer=null;
+  S.offset={x:0,y:0};
+  if(VT.useGaze){ // re-centrado rápido: corrige la deriva desde la calibración
+    clr(); cross(VT.W/2,VT.H/2,18); txt('Mirá la cruz',VT.W/2,VT.H/2+50,18,C.mut,'center',500);
+    const arr=[]; S.collect={from:performance.now()+350, arr}; await sleep(1300); S.collect=null;
+    const ps=arr.filter(isOpen).map(f=>predictWith(S.model,f));
+    if(ps.length>=8){ let dx=median(ps.map(p=>p.x))-VT.W/2, dy=median(ps.map(p=>p.y))-VT.H/2; const m=Math.hypot(dx,dy), lim=180; if(m>lim){ dx*=lim/m; dy*=lim/m; } S.offset={x:dx,y:dy}; }
+  }
   VT.t0=performance.now();
   if(VT.useGaze){ S.mode='vt'; R=startRec(); VT.t0=performance.now(); snapTimer=setInterval(takeSnap,2500); }
   const lv=S.levels[key]||1;
@@ -1198,6 +1300,7 @@ async function runVisionTest(key){
     if(await showSummary(res, prev)==='view') view=res;
   } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en el test: '+e.message); } }
   clearInterval(snapTimer); if(R) stopRec(R);
+  S.offset={x:0,y:0};
   S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
   renderTestCards();
   if(view) openTestView(view);
