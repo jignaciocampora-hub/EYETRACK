@@ -318,6 +318,7 @@ function loop(){
     const s = p ? { t:now, x:p.x, y:p.y, valid:true, h:f.h, v:f.v } : { t:now, valid:false };
     VT.gaze.push(s); if(p) VT.lastGaze=s;
   }
+  if(S.mode==='eyedom' && f) VT.face.push({ t:now, oL:f.oL, oR:f.oR });
   if(S.tab==='prep' && $('home').style.display!=='none') drawPreview(res, f);
 }
 
@@ -336,7 +337,7 @@ function extract(res){
     h:(e1.h+e2.h)/2, v:(e1.v+e2.v)/2,
     yaw: M ? M[8] : 0, pitch: M ? M[9] : 0,
     nx:L[1].x, ny:L[1].y, scale:Math.hypot(L[454].x-L[234].x, L[454].y-L[234].y),
-    open:Math.min(e1.open,e2.open)
+    open:Math.min(e1.open,e2.open), oR:e1.open, oL:e2.open
   };
 }
 const isOpen = f => !S.openMed || f.open > S.openMed*0.6;
@@ -758,7 +759,7 @@ function renderMetrics(){
 /* ================= motor de tests visuales ================= */
 const ABORT = new Error('abort');
 const C = { bg:'#0b0f14', fg:'#e6edf3', mut:'#8b949e', go:'#2ea043', bad:'#f85149', warn:'#d29922', acc:'#1f6feb', y:'#ffd33d', ball:'#58a6ff' };
-const VT = { W:0, H:0, tapCb:null, cancel:null, abort:false, gaze:[], lastGaze:null, useGaze:false };
+const VT = { W:0, H:0, tapCb:null, cancel:null, abort:false, gaze:[], lastGaze:null, useGaze:false, face:[], snaps:[] };
 const vtc=$('vtc'), X=vtc.getContext('2d');
 function vtSetup(){ const d=devicePixelRatio||1; VT.W=innerWidth; VT.H=innerHeight; vtc.width=Math.round(VT.W*d); vtc.height=Math.round(VT.H*d); X.setTransform(d,0,0,d,0,0); }
 vtc.addEventListener('pointerdown', e=>{ e.preventDefault(); if(VT.tapCb) VT.tapCb({ x:e.clientX, y:e.clientY, t:performance.now() }); });
@@ -1022,6 +1023,67 @@ async function tPursuit(lv){
     ['Tiempo sobre el objetivo',on,'%',0],['Error medio',mean(errs),'px',0],['Error mediano',median(errs),'px',0],['Sin mirada detectada',frames?100*nog/frames:null,'%',0]]);
 }
 
+
+/* ---------- 8. Ojo dominante (Miles / Porta) ---------- */
+async function askButtons(title, sub, options, draw){
+  const cx=VT.W/2; clr(); if(draw) draw();
+  txt(title, cx, 54, 28, C.fg, 'center', 700);
+  let y=96; wrap(sub, Math.min(VT.W*0.86,700), 19).forEach(l=>{ txt(l,cx,y,19,C.mut,'center',500); y+=28; });
+  const n=options.length, bw=Math.min(240,(VT.W-40)/n-12), bh=64, gap=14, tot=n*bw+(n-1)*gap, by=VT.H-bh-30;
+  const boxes=options.map((o,i)=>({ x:cx-tot/2+i*(bw+gap), y:by, w:bw, h:bh, o }));
+  boxes.forEach((b,i)=>{ X.fillStyle = n===2 ? (i===0?C.go:C.bad) : C.acc; X.beginPath(); X.roundRect ? X.roundRect(b.x,b.y,b.w,b.h,12) : X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(b.o,b.x+b.w/2,b.y+b.h/2,20,'#fff','center',700); });
+  while(true){
+    const t=await vtWait(null,true);
+    const i=boxes.findIndex(b=>t.x>=b.x && t.x<=b.x+b.w && t.y>=b.y-8 && t.y<=b.y+b.h+8);
+    if(i>=0) return i;
+  }
+}
+function faceRatio(t0,t1){
+  const a=VT.face.filter(s=>s.t>=t0 && s.t<=t1 && s.oR>0.01).map(s=>s.oL/s.oR);
+  return a.length>=5 ? median(a) : null;
+}
+async function tEyeDom(){
+  const cx=VT.W/2, cy=VT.H/2+20;
+  const target=()=>{ dot(cx,cy,74,C.bad); dot(cx,cy,52,'#fff'); dot(cx,cy,30,C.bad); dot(cx,cy,9,'#fff'); };
+  await intro('Ojo dominante',[
+    'Métodos clásicos de Miles (triángulo con las manos) y Porta (señalar con el dedo).',
+    'El jugador se ubica de frente al iPad, a 1–3 m. El evaluador maneja la pantalla y marca las respuestas que da el jugador.',
+    'Si la cámara está activa, verifica qué ojo cerró el jugador (funciona mejor a menos de 1,5 m).']);
+  const method = (await askButtons('Método','Elegí cómo se va a evaluar',['Miles (triángulo)','Porta (dedo)'].map(s=>s)))===0 ? 'Miles' : 'Porta';
+  const hand = ['Derecha','Izquierda',null][await askButtons('Mano hábil del jugador','Sirve para detectar dominancia cruzada ojo-mano',['Derecha','Izquierda','Sin dato'])];
+  const frameTxt = method==='Miles'
+    ? 'Con los DOS ojos abiertos, juntá las manos formando un pequeño triángulo, brazos extendidos, y encuadrá el centro del objetivo.'
+    : 'Con los DOS ojos abiertos, extendé el brazo y tapá con la punta del dedo índice el centro del objetivo.';
+  const keepTxt = method==='Miles' ? '¿El centro del objetivo sigue dentro del triángulo?' : '¿El dedo sigue tapando el centro del objetivo?';
+  const still = method==='Miles' ? 'las manos' : 'el brazo';
+  const camOn=!!S.lm; VT.face=[]; if(camOn) S.mode='eyedom';
+  const N=3, votes=[]; let verified=0, checks=0;
+  for(let i=0;i<N;i++){
+    const order = Math.random()<.5 ? ['L','R'] : ['R','L'];
+    const tA=performance.now();
+    await askButtons(`Repetición ${i+1} de ${N}`, frameTxt, ['Encuadrado'], target);
+    const base=faceRatio(tA, performance.now());
+    const ans={};
+    for(const eye of order){
+      const t1=performance.now();
+      const k=await askButtons(`Cerrá el ojo ${eye==='L'?'IZQUIERDO':'DERECHO'}`, `Sin mover ${still}: ${keepTxt}`, ['Sí','No'], target);
+      ans[eye]=k===0;
+      if(camOn){ checks++; const r=faceRatio(t1, performance.now()); if(r!=null && base!=null && (eye==='L' ? r<base*0.6 : r>base/0.6)) verified++; }
+      if(eye===order[0]) await askButtons('Abrí los dos ojos', 'Volvé a encuadrar el objetivo con los dos ojos abiertos.', ['Listo'], target);
+    }
+    votes.push(ans.L && !ans.R ? 'Derecho' : ans.R && !ans.L ? 'Izquierdo' : 'Indefinido');
+  }
+  S.mode='idle';
+  const cR=votes.filter(v=>v==='Derecho').length, cL=votes.filter(v=>v==='Izquierdo').length;
+  const dom = cR>=2 ? 'Derecho' : cL>=2 ? 'Izquierdo' : 'No definido', cons=Math.max(cR,cL);
+  const strength = cons===3 ? 'Fuerte' : cons===2 ? 'Moderada' : 'No definida';
+  const cross = hand && dom!=='No definido' ? ((hand==='Derecha')!==(dom==='Derecho') ? 'Sí' : 'No') : '—';
+  const metrics=[['Ojo dominante',dom,'',0],['Consistencia',`${cons} / ${N} repeticiones`,'',0],['Grado de dominancia',strength,'',0],
+    ['Método',method,'',0],['Mano hábil',hand||'Sin dato','',0],['Dominancia cruzada ojo-mano',cross,'',0]];
+  if(camOn) metrics.push(['Cierres de ojo verificados por cámara',`${verified} / ${checks}`,'',0]);
+  return mkRes('eyedom',1,{label:'Ojo dominante',value:dom,unit:'',dec:0,better:null},metrics,{votes,method,hand});
+}
+
 const TESTS = {
   react:   { name:'Tiempo de reacción', area:'Velocidad de reacción', fn:tReact, desc:'Respuesta lo más rápida posible a un estímulo visual central.' },
   gonogo:  { name:'Go / No-Go', area:'Concentración e inhibición', fn:tGoNoGo, desc:'Responder al verde e inhibir la respuesta al rojo. Mide atención sostenida y control de impulsos.' },
@@ -1029,6 +1091,7 @@ const TESTS = {
   schulte: { name:'Tabla de Schulte', area:'Atención y búsqueda visual', fn:tSchulte, desc:'Encontrar números en orden lo más rápido posible usando la visión periférica.' },
   mot:     { name:'Seguimiento múltiple (MOT)', area:'Atención dividida', fn:tMOT, desc:'Seguir varias pelotas en movimiento a la vez, como compañeros y rivales en el campo.' },
   eyehand: { name:'Coordinación ojo-mano', area:'Coordinación visomotora', fn:tEyeHand, desc:'Tocar objetivos que aparecen en lugares aleatorios, lo más rápido y preciso posible.' },
+  eyedom:  { name:'Ojo dominante', area:'Dominancia ocular', fn:tEyeDom, noLevels:true, noGaze:true, desc:'Determina el ojo dominante con los métodos de Miles o Porta (3 repeticiones) y detecta dominancia cruzada ojo-mano. El evaluador marca las respuestas.' },
   pursuit: { name:'Seguimiento suave', area:'Motilidad ocular', fn:tPursuit, needsGaze:true, desc:'Seguir un objetivo en movimiento solo con los ojos. La cámara mide cuánto te mantenés sobre él.' },
 };
 
@@ -1102,7 +1165,7 @@ function buildGazeRec(dur){
 }
 const prevResult = r => S.tests.filter(o=>o.athlete===r.athlete && o.key===r.key && o.level===r.level && o.date<r.date).at(-1);
 function compare(r, p){
-  if(!p || r.main.value==null || p.main.value==null) return null;
+  if(!p || typeof r.main.value!=='number' || typeof p.main.value!=='number') return null;
   const d=r.main.value-p.main.value, better = r.main.better==='low' ? d<0 : d>0;
   return { d, better, same: Math.abs(d)<1e-9 };
 }
@@ -1110,7 +1173,7 @@ function compare(r, p){
 async function runVisionTest(key){
   const T=TESTS[key];
   if(T.needsGaze && !S.model){ alert('Este test necesita la cámara activa y la calibración de mirada.'); return; }
-  VT.useGaze = !!S.model && (T.needsGaze || $('optVtGaze').checked);
+  VT.useGaze = !!S.model && !T.noGaze && (T.needsGaze || $('optVtGaze').checked);
   if(VT.useGaze && sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes del test.'); return; }
   VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
   $('vt').classList.add('on'); vtSetup(); newFilter();
@@ -1145,7 +1208,7 @@ async function showSummary(r, prev){
   let y=Math.max(70, VT.H/2-200);
   txt(r.name, cx, y, 26, C.fg, 'center', 700); y+=50;
   txt(fmtV(r.main.value,r.main.unit,r.main.dec), cx, y+10, 64, C.y, 'center', 700); y+=64;
-  txt(r.main.label+` · nivel ${r.level}`, cx, y, 16, C.mut, 'center', 500); y+=34;
+  txt(TESTS[r.key]&&TESTS[r.key].noLevels ? r.main.label : r.main.label+` · nivel ${r.level}`, cx, y, 16, C.mut, 'center', 500); y+=34;
   const c=compare(r,prev);
   if(c) txt(c.same ? 'Igual que la vez anterior' : `${c.better?'Mejor':'Peor'} que la vez anterior (${fmtV(prev.main.value,prev.main.unit,prev.main.dec)})`, cx, y, 18, c.same?C.mut:c.better?C.go:C.bad, 'center', 600);
   y+=44;
@@ -1260,12 +1323,12 @@ function renderTvMetrics(){
 function renderTestCards(){
   const a=curAthlete();
   $('testGrid').innerHTML=Object.entries(TESTS).map(([k,T])=>{
-    const last=S.tests.filter(r=>r.key===k && r.athlete===a).at(-1), lv=S.levels[k]||1;
+    const last=S.tests.filter(r=>r.key===k && r.athlete===a).at(-1), lv=S.levels[k]||1, lvTxt=T.noLevels?'':` · nivel ${last?last.level:''}`;
     const blocked=T.needsGaze && !S.model;
     return `<div class="tcard"><div class="tarea">${esc(T.area)}</div><h3>${esc(T.name)}</h3><p class="sub">${esc(T.desc)}</p>
       ${T.needsGaze?`<div class="sub ${blocked?'warnc':'ok'}">${blocked?'Requiere cámara y calibración':'Usa seguimiento ocular'}</div>`:''}
-      <div class="lv" data-k="${k}">${[1,2,3].map(n=>`<button class="${n===lv?'on':''}" data-n="${n}">Nivel ${n}</button>`).join('')}</div>
-      <div class="sub">${last?`Último: <b style="color:var(--tx)">${fmtV(last.main.value,last.main.unit,last.main.dec)}</b> · ${new Date(last.date).toLocaleDateString('es-AR')} · nivel ${last.level}`:'Sin resultados para este jugador'}</div>
+      ${T.noLevels?'':`<div class="lv" data-k="${k}">${[1,2,3].map(n=>`<button class="${n===lv?'on':''}" data-n="${n}">Nivel ${n}</button>`).join('')}</div>`}
+      <div class="sub">${last?`Último: <b style="color:var(--tx)">${fmtV(last.main.value,last.main.unit,last.main.dec)}</b> · ${new Date(last.date).toLocaleDateString('es-AR')}${lvTxt}`:'Sin resultados para este jugador'}</div>
       <button class="go tstart" data-k="${k}" ${blocked?'disabled':''}>Empezar</button></div>`;
   }).join('');
   $('testGrid').querySelectorAll('.lv button').forEach(b=>b.addEventListener('click',()=>{ S.levels[b.parentElement.dataset.k]=+b.dataset.n; renderTestCards(); }));
@@ -1287,7 +1350,7 @@ function renderResults(){
   $('testHist').innerHTML = !tests.length ? 'Sin resultados de tests para este jugador' :
     '<table><tr><th>Fecha</th><th>Test</th><th>Nivel</th><th>Resultado</th><th>Vs. anterior</th><th>Mirada</th></tr>'+
     tests.map(t=>{ const c=compare(t, prevResult(t));
-      return `<tr><td>${new Date(t.date).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td><td>${esc(t.name)}</td><td>${t.level}</td>
+      return `<tr><td>${new Date(t.date).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td><td>${esc(t.name)}</td><td>${TESTS[t.key]&&TESTS[t.key].noLevels?'—':t.level}</td>
       <td><b>${fmtV(t.main.value,t.main.unit,t.main.dec)}</b></td><td class="${c?(c.same?'':c.better?'ok':'badc'):''}">${c?(c.same?'=':c.better?'Mejor':'Peor'):'—'}</td>
       <td>${t.gazeRec?`<button class="sec tvopen" data-id="${esc(t.id)}" style="padding:5px 10px;font-size:13px">Ver</button>`:'—'}</td></tr>`; }).join('')+'</table>';
   $('testHist').className = tests.length ? 'tblwrap' : 'tblwrap status';
@@ -1461,7 +1524,7 @@ async function makePDF(){
       table(['Test','Área','Fecha','Nivel','Resultado','Vs. anterior'],
         keys.map(k=>{ const r=tests.filter(t=>t.key===k).at(-1), p=prevResult(r), c=compare(r,p);
           const vs = !c ? '-' : c.same ? 'Igual' : `${c.better?'Mejor':'Peor'} (${plain(p.main.value,p.main.unit,p.main.dec)})`;
-          return [TESTS[k].name, TESTS[k].area, new Date(r.date).toLocaleDateString('es-AR'), String(r.level), plain(r.main.value,r.main.unit,r.main.dec),
+          return [TESTS[k].name, TESTS[k].area, new Date(r.date).toLocaleDateString('es-AR'), TESTS[k].noLevels?'-':String(r.level), plain(r.main.value,r.main.unit,r.main.dec),
             [vs, !c||c.same?[87,96,106]:c.better?[26,127,55]:[207,34,46]]]; }),
         [42,44,22,13,26,35]);
 
@@ -1470,7 +1533,7 @@ async function makePDF(){
         const hist=tests.filter(t=>t.key===k), r=hist.at(-1), p=prevResult(r);
         ensure(40);
         h3(`${TESTS[k].name} - ${TESTS[k].area}`);
-        para(`${TESTS[k].desc} Nivel ${r.level} · ${new Date(r.date).toLocaleString('es-AR')}${r.gaze?' · con seguimiento ocular':''}.`,9);
+        para(`${TESTS[k].desc} ${TESTS[k].noLevels?'':`Nivel ${r.level} · `}${new Date(r.date).toLocaleString('es-AR')}${r.gaze?' · con seguimiento ocular':''}.`,9);
         table(['Métrica','Actual','Anterior (mismo nivel)'],
           r.metrics.map(([l,v,u,d],i)=>[l, plain(v,u,d), p&&p.metrics[i] ? plain(p.metrics[i][1],p.metrics[i][2],p.metrics[i][3]) : '-']),
           [80,45,57]);
@@ -1497,7 +1560,7 @@ async function makePDF(){
           doc.addImage(radarImg(r.detail.byDir),'PNG',M+CW/2-35,y,70,70); y+=74;
         }
         const same=hist.filter(t=>t.level===r.level).slice(-8);
-        if(same.length>=2){
+        if(same.length>=2 && typeof r.main.value==='number'){
           ensure(52); font(9,'bold',[87,96,106]); doc.text(clean(`Evolución: ${r.main.label} (nivel ${r.level})`),M,y); y+=2;
           doc.addImage(barChartImg(same.map(t=>t.main.value), same.map(t=>dShort(t.date)), r.main.unit, r.main.dec),'PNG',M,y,CW,CW*300/900); y+=CW*300/900+4;
         }
