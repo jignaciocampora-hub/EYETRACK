@@ -1,0 +1,2115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>TrakEye</title>
+<meta name="apple-mobile-web-app-title" content="TrakEye">
+<meta name="theme-color" content="#0d1117">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--tx:#e6edf3;--mut:#8b949e;--acc:#2ea043;--acc2:#1f6feb;--warn:#d29922;--bad:#f85149}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top) 16px 40px}
+main{max-width:1000px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;padding:16px 0 8px;flex-wrap:wrap}
+h1{font-size:26px;margin:0;letter-spacing:-.5px} h1 span{color:var(--acc)}
+.sub{color:var(--mut);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.card h2{font-size:16px;margin:0 0 10px}
+button{font:inherit;border:0;border-radius:10px;padding:12px 16px;background:var(--acc2);color:#fff;font-weight:600;cursor:pointer}
+button.sec{background:#30363d} button.go{background:var(--acc)} button.danger{background:#5a1d1d} button:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input[type=text],select{font:inherit;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+label.chk{display:flex;gap:10px;align-items:center;font-size:15px}
+label.chk input{width:20px;height:20px;flex:none}
+.status{font-size:14px;color:var(--mut);margin-top:8px}
+.ok{color:var(--acc)} .warnc{color:var(--warn)} .badc{color:var(--bad)}
+#nav{position:sticky;top:0;z-index:10;background:var(--bg);display:flex;gap:6px;padding:8px 0;overflow-x:auto}
+#nav button{background:transparent;color:var(--mut);padding:10px 14px;white-space:nowrap}
+#nav button.on{background:var(--card);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line)}
+#athleteBar{display:flex;gap:10px;align-items:center;margin:4px 0 8px}
+#athleteBar input{max-width:340px}
+#preview{width:100%;max-width:360px;border-radius:10px;background:#000;display:block;margin-top:10px}
+.clip{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);color:var(--tx);gap:8px}
+.clip button{padding:4px 10px;font-size:13px}
+.trial{padding:12px;border:1px solid var(--line);border-radius:10px;margin-top:8px;cursor:pointer;color:var(--tx)}
+.trial:active{background:#1c2330}
+#testGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.tcard h3{margin:0;font-size:17px}
+.tcard p{margin:0}
+.tarea{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--acc)}
+.lv{display:flex;gap:6px}
+.lv button{flex:1;background:#30363d;padding:8px 6px;font-size:13px}
+.lv button.on{background:var(--acc2)}
+.tcard .tstart{margin-top:auto}
+.overlay{position:fixed;inset:0;background:#000;z-index:50;display:none;touch-action:none;overflow:hidden}
+.overlay.on{display:block}
+#calib,#live{background:#111}
+#vt{background:#0b0f14}
+#vtc{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.target{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:var(--bad);transition:transform 1s ease;box-shadow:0 0 0 6px rgba(248,81,73,.25)}
+.target::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#fff}
+.ref{position:absolute;width:10px;height:10px;margin:-5px;border-radius:50%;background:#444}
+.msg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;width:min(80%,560px);font-size:20px;z-index:3}
+#testVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
+#gazeDot{position:fixed;width:28px;height:28px;margin:-14px;border-radius:50%;border:3px solid #ffd33d;background:rgba(255,211,61,.25);pointer-events:none;z-index:60;display:none}
+#decision{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 28px);display:none;text-align:center;z-index:4}
+#decision .dq{display:inline-block;background:rgba(13,17,23,.85);padding:8px 16px;border-radius:10px;margin-bottom:10px;font-size:18px}
+#decision button{font-size:18px;padding:14px 22px}
+.closeBtn{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:10px;z-index:5;background:rgba(48,54,61,.85);padding:8px 12px}
+#cam{position:fixed;width:2px;height:2px;opacity:.01;left:0;top:0;pointer-events:none}
+.vwrap{position:relative;background:#000;border-radius:10px;overflow:hidden}
+#aVideo{width:100%;height:58vh;display:block;object-fit:contain;background:#000}
+#aCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.seg button{background:#30363d;padding:10px 12px;font-size:14px}
+.seg button.on{background:var(--acc2)}
+input[type=range]{flex:1;accent-color:var(--acc2)}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:6px}
+td,th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--mut);font-weight:500}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:10px}
+.kpi{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:20px}
+.kpi span{font-size:12px;color:var(--mut)}
+.tblwrap{overflow-x:auto}
+</style>
+</head>
+<body>
+<video id="cam" playsinline muted autoplay></video>
+
+<main id="home">
+  <header><img src="data:image/png;base64,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" alt="" width="40" height="40" style="border-radius:10px"><h1>Trak<span>Eye</span></h1><div class="sub">Seguimiento ocular y entrenamiento visual</div></header>
+  <div id="athleteBar"><input type="text" id="athlete" placeholder="Nombre del jugador"></div>
+  <nav id="nav">
+    <button data-t="prep" class="on">Cámara y calibración</button>
+    <button data-t="video">Análisis de video</button>
+    <button data-t="tests">Tests visuales</button>
+    <button data-t="results">Resultados</button>
+  </nav>
+
+  <!-- PREPARACIÓN -->
+  <div id="tab-prep">
+    <section class="card">
+      <h2>1 · Cámara</h2>
+      <div class="sub">iPad horizontal en un soporte fijo, a 40–60 cm de la cara, con luz de frente (no a contraluz).</div>
+      <div class="row" style="margin-top:10px"><button id="btnCam">Activar cámara</button></div>
+      <canvas id="preview" width="360" height="203"></canvas>
+      <div class="status" id="camStatus">Cámara apagada</div>
+    </section>
+    <section class="card">
+      <h2>2 · Calibración de la mirada</h2>
+      <div class="sub">Necesaria para el análisis de video y para los tests que usan seguimiento ocular. Recalibrá con cada jugador y si se mueve el iPad.</div>
+      <div class="row" style="margin-top:10px">
+        <button id="btnCal" disabled>Calibrar</button>
+        <button id="btnLive" class="sec" disabled>Probar mirada</button>
+      </div>
+      <div class="status" id="calStatus">Sin calibrar</div>
+    </section>
+  </div>
+
+  <!-- VIDEO -->
+  <div id="tab-video" style="display:none">
+    <section class="card">
+      <h2>Análisis de mirada sobre video</h2>
+      <div class="sub">Cualquier video: jugadas, entrenamientos, ejercicios, estímulos visuales, presentaciones… Formatos recomendados: MP4 o MOV.</div>
+      <div class="row" style="margin-top:10px"><button class="sec" id="btnClips">Cargar videos</button>
+        <input type="file" id="fileClips" accept="video/*,.mp4,.mov,.m4v,.webm,.mkv,.avi" multiple hidden></div>
+      <div id="clipList" class="status">Ningún video cargado</div>
+      <div style="margin-top:14px;display:grid;gap:12px">
+        <label class="chk"><input type="checkbox" id="optDrift" checked> Corrección de deriva (cruz antes de cada video)</label>
+        <label class="chk"><input type="checkbox" id="optDot"> Mostrar punto de mirada durante la reproducción</label>
+        <label class="chk"><input type="checkbox" id="optDecision"> Hacer una pregunta al final de cada video</label>
+        <div id="decBox" style="display:none;gap:8px">
+          <input type="text" id="decQuestion" value="¿Qué decisión tomarías?" aria-label="Pregunta">
+          <input type="text" id="decOptions" value="Opción A, Opción B, Opción C" aria-label="Opciones separadas por coma" style="margin-top:8px">
+          <div class="status">Opciones separadas por coma (ej.: Pase, Patada, Corre).</div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="go" id="btnTest" disabled>Iniciar análisis</button></div>
+      <div class="status" id="videoHint">Primero activá la cámara y calibrá.</div>
+    </section>
+  </div>
+
+  <!-- TESTS -->
+  <div id="tab-tests" style="display:none">
+    <section class="card">
+      <h2>Tests y entrenamiento visual</h2>
+      <div class="sub">Cada test sirve para evaluar (nivel fijo, comparable en el tiempo) o para entrenar (subí de nivel). Los resultados se guardan en este dispositivo por jugador.</div>
+      <label class="chk" style="margin-top:12px"><input type="checkbox" id="optVtGaze" disabled> Registrar el movimiento de los ojos durante los tests (requiere cámara y calibración)</label>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" id="optLivePanel"> Panel del evaluador en vivo en la Tabla de Schulte (pantalla horizontal: tiempo, objetivo, "buscando hace" y mapa de mirada por casillero)</label>
+      <div class="status">Con esta opción, cada test se graba junto con la mirada. Al terminar podés ver la repetición con el recorrido de los ojos, el mapa de calor y el gráfico del movimiento ocular.</div>
+    </section>
+    <div id="testGrid"></div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="tab-results" style="display:none">
+    <section class="card">
+      <h2>Informe</h2>
+      <div class="row"><select id="resAthlete" style="max-width:340px"></select>
+        <button class="go" id="btnPdf">Generar informe PDF</button></div>
+      <div class="status" id="pdfStatus">El informe incluye los tests del jugador con su evolución y los análisis de video de esta sesión.</div>
+    </section>
+    <section class="card">
+      <h2>Ranking del plantel</h2>
+      <select id="rankSel" style="max-width:420px"></select>
+      <div id="rankTbl" class="tblwrap status" style="margin-top:8px">Sin datos</div>
+    </section>
+    <section class="card">
+      <h2>Tests visuales</h2>
+      <div id="testHist" class="tblwrap status">Sin resultados</div>
+      <div class="row" style="margin-top:12px">
+        <button class="sec" id="btnTestsCsv">Tests CSV</button>
+        <button class="danger" id="btnClearTests">Borrar historial del jugador</button>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Análisis de video (esta sesión)</h2>
+      <div id="trialList" class="status">Todavía no hay análisis</div>
+      <div class="row" style="margin-top:12px">
+        <button class="sec" id="btnRaw" disabled>Mirada cruda CSV</button>
+        <button class="sec" id="btnSum" disabled>Resumen video CSV</button>
+      </div>
+      <div class="status">Los análisis de video se pierden al cerrar la página: exportá o generá el PDF antes.</div>
+    </section>
+  </div>
+</main>
+
+<main id="analysis" style="display:none">
+  <header>
+    <button class="sec" id="btnBack">← Volver</button>
+    <div><div id="aTitle" style="font-weight:700"></div><div class="sub" id="aSub"></div></div>
+  </header>
+  <div class="vwrap"><video id="aVideo" playsinline muted preload="auto"></video><canvas id="aCanvas"></canvas></div>
+  <div class="row" style="margin:10px 0"><button id="aPlay">▶︎</button><input type="range" id="aSeek" min="0" max="1000" value="0"></div>
+  <div class="seg row" id="aModes">
+    <button data-m="replay" class="on">Repetición</button>
+    <button data-m="heat">Mapa de calor</button>
+    <button data-m="focus">Mapa de enfoque</button>
+    <button data-m="path">Recorrido</button>
+    <button data-m="aoi">Zonas</button>
+  </div>
+  <label class="chk" id="aggWrap" style="margin-top:10px;display:none"><input type="checkbox" id="optAgg"> <span id="aggLabel">Mostrar todos los jugadores que vieron este video</span></label>
+  <div class="status" id="aoiHint" style="display:none">Arrastrá sobre el video para marcar una zona de interés. Las zonas se comparten entre todos los jugadores que vieron el mismo video.</div>
+  <div class="card" id="aMetrics"></div>
+</main>
+
+<main id="tview" style="display:none">
+  <header>
+    <button class="sec" id="tvBack">← Volver</button>
+    <div><div id="tvTitle" style="font-weight:700"></div><div class="sub" id="tvSub"></div></div>
+  </header>
+  <div class="vwrap" id="tvWrap" style="aspect-ratio:16/10;max-height:62vh;margin:0 auto"><video id="tvVideo" playsinline muted preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:fill"></video><canvas id="tvCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas></div>
+  <div class="row" style="margin:10px 0"><button id="tvPlay">▶︎</button><input type="range" id="tvSeek" min="0" max="1000" value="0"><span class="sub" id="tvTime" style="min-width:90px;text-align:right"></span></div>
+  <div class="seg row" id="tvModes">
+    <button data-m="replay" class="on">Repetición</button>
+    <button data-m="heat">Mapa de calor</button>
+    <button data-m="path">Recorrido</button>
+    <button data-m="cells" id="tvCellsBtn" style="display:none">Por casillero</button>
+  </div>
+  <div class="status" id="tvNoVideo" style="display:none">No hay grabación de la pantalla para este test (es de una sesión anterior o el navegador no permite grabar). Se muestra solo la mirada.</div>
+  <div class="card">
+    <div style="font-weight:600">Movimiento ocular en el tiempo</div>
+    <div class="sub">Posición <span style="color:#58a6ff">horizontal</span> y <span style="color:#f0883e">vertical</span> de la mirada (% de la pantalla). Las mesetas son fijaciones; los saltos bruscos, movimientos sacádicos.</div>
+    <canvas id="tvTrace" style="width:100%;height:190px;display:block;margin-top:8px"></canvas>
+  </div>
+  <div class="card" id="tvMetrics"></div>
+</main>
+
+<div class="overlay" id="calib"><div class="msg" id="calMsg"></div></div>
+<div class="overlay" id="test">
+  <button class="closeBtn" id="btnAbort">✕ Salir</button>
+  <video id="testVideo" playsinline muted></video>
+  <div class="msg" id="testMsg"></div>
+  <div id="decision"></div>
+</div>
+<div class="overlay" id="live">
+  <button class="closeBtn" id="btnLiveExit">✕ Salir</button>
+  <div class="msg sub">Mirá los puntos grises. El círculo amarillo debería seguir tu mirada.</div>
+</div>
+<div class="overlay" id="vt"><canvas id="vtc"></canvas><button class="closeBtn" id="btnVtExit">✕ Salir</button></div>
+<div id="gazeDot"></div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+const LS_TESTS = 'trakeye_tests_v1', LS_ATH = 'trakeye_athlete';
+
+const $ = id => document.getElementById(id);
+const cam = $('cam');
+const S = { lm:null, looping:false, lastT:-1, mode:'idle', collect:null, model:null, openMed:null,
+  calibSize:null, calErr:null, clips:[], trials:[], aois:{}, trial:null, drift:{x:0,y:0},
+  filt:null, showDot:false, abort:false, wake:null, tests:[], levels:{}, tab:'prep' };
+
+/* ================= utilidades ================= */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const mean = a => a.length ? a.reduce((s,v)=>s+v,0)/a.length : null;
+const median = a => { if(!a.length) return null; const b=[...a].sort((x,y)=>x-y); const m=b.length>>1; return b.length%2?b[m]:(b[m-1]+b[m])/2; };
+const sdev = a => { if(a.length<2) return null; const m=mean(a); return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1)); };
+const clamp = (v,a,b) => Math.max(a,Math.min(b,v));
+const rand = (a,b) => a+Math.random()*(b-a);
+const shuffle = a => { const b=[...a]; for(let i=b.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [b[i],b[j]]=[b[j],b[i]]; } return b; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = (v,d=1) => v==null||isNaN(v) ? '—' : v.toFixed(d);
+const fmtV = (v,unit,dec=0) => v==null||(typeof v==='number'&&isNaN(v)) ? '—' : typeof v==='string' ? v : v.toFixed(dec)+(unit?(unit==='%'||unit==='x'||unit==='°'?'':' ')+unit:'');
+const curAthlete = () => $('athlete').value.trim() || 'Sin nombre';
+const dShort = iso => { const d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}); };
+
+class LowPass { constructor(){this.y=null} f(x,a){ this.y = this.y===null ? x : a*x+(1-a)*this.y; return this.y; } }
+class OneEuro {
+  constructor(mc=0.8,b=0.01,dc=1){ this.mc=mc; this.b=b; this.dc=dc; this.x=new LowPass(); this.dx=new LowPass(); this.t=null; }
+  a(c,dt){ const tau=1/(2*Math.PI*c); return 1/(1+tau/dt); }
+  f(x,t){
+    if(this.t===null){ this.t=t; this.dx.f(0,1); return this.x.f(x,1); }
+    const dt=Math.max(1e-3,t-this.t); this.t=t;
+    const ed=this.dx.f((x-this.x.y)/dt, this.a(this.dc,dt));
+    return this.x.f(x, this.a(this.mc+this.b*Math.abs(ed), dt));
+  }
+}
+const newFilter = () => { S.filt = { x:new OneEuro(), y:new OneEuro() }; };
+newFilter();
+
+/* ================= pestañas ================= */
+const TABS=['prep','video','tests','results'];
+function showTab(t){
+  S.tab=t;
+  TABS.forEach(k=>{ $('tab-'+k).style.display = k===t ? 'block' : 'none'; });
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+  if(t==='tests') renderTestCards();
+  if(t==='results') renderResults();
+}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
+try { $('athlete').value = localStorage.getItem(LS_ATH) || ''; } catch(e){}
+$('athlete').addEventListener('input', ()=>{ try{ localStorage.setItem(LS_ATH, $('athlete').value); }catch(e){} if(S.tab==='tests') renderTestCards(); });
+
+/* ================= cámara + MediaPipe ================= */
+$('btnCam').addEventListener('click', async () => {
+  const st=$('camStatus');
+  try {
+    st.textContent='Pidiendo permiso de cámara…';
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:{ideal:1280}, height:{ideal:720} }, audio:false });
+    cam.srcObject = stream; await cam.play();
+    const pv=$('preview'); if(cam.videoWidth) pv.height=Math.round(pv.width*cam.videoHeight/cam.videoWidth);
+    if(!S.lm){
+      st.textContent='Cargando modelo de rostro…';
+      const fs = await FilesetResolver.forVisionTasks(WASM);
+      const opts = d => ({ baseOptions:{ modelAssetPath:MODEL, delegate:d }, runningMode:'VIDEO', numFaces:1, outputFacialTransformationMatrixes:true });
+      try { S.lm = await FaceLandmarker.createFromOptions(fs, opts('GPU')); }
+      catch(e){ S.lm = await FaceLandmarker.createFromOptions(fs, opts('CPU')); }
+    }
+    $('btnCam').textContent='Cámara activa'; $('btnCam').disabled=true; $('btnCal').disabled=false;
+    if(!S.looping){ S.looping=true; requestAnimationFrame(loop); }
+  } catch(e){ st.innerHTML='<span class="badc">No se pudo activar la cámara: '+esc(e.message)+'</span>'; }
+});
+
+function loop(){
+  requestAnimationFrame(loop);
+  if(cam.readyState<2 || cam.currentTime===S.lastT) return;
+  S.lastT = cam.currentTime;
+  const now = performance.now();
+  let res; try { res = S.lm.detectForVideo(cam, now); } catch(e){ return; }
+  const f = extract(res);
+  S.lastF=f; S.lastFT=now;
+  if(S.collect && f && now>=S.collect.from) S.collect.arr.push(f);
+  if(S.mode==='test') recordTest(f, now);
+  else if(S.mode==='live') moveDot(gaze(f, now));
+  else if(S.mode==='vt'){
+    const p=gaze(f, now);
+    const s = p ? { t:now, x:p.x, y:p.y, valid:true, h:f.h, v:f.v } : { t:now, valid:false };
+    VT.gaze.push(s); if(p) VT.lastGaze=s;
+  }
+  if(S.mode==='eyedom' && f) VT.face.push({ t:now, oL:f.oL, oR:f.oR });
+  if(S.tab==='prep' && $('home').style.display!=='none') drawPreview(res, f);
+}
+
+function extract(res){
+  if(!res || !res.faceLandmarks || !res.faceLandmarks.length) return null;
+  const L = res.faceLandmarks[0];
+  const eye = (iris,a,b,up,lo) => {
+    const I=L[iris], A=L[a], B=L[b];
+    const dx=B.x-A.x, dy=B.y-A.y, w2=dx*dx+dy*dy, w=Math.sqrt(w2);
+    const px=I.x-A.x, py=I.y-A.y;
+    return { h:(px*dx+py*dy)/w2, v:(py*dx-px*dy)/w2, open:Math.hypot(L[up].x-L[lo].x, L[up].y-L[lo].y)/w };
+  };
+  const e1 = eye(468,33,133,159,145), e2 = eye(473,362,263,386,374);
+  const M = res.facialTransformationMatrixes && res.facialTransformationMatrixes[0] && res.facialTransformationMatrixes[0].data;
+  return {
+    h:(e1.h+e2.h)/2, v:(e1.v+e2.v)/2,
+    yaw: M ? M[8] : 0, pitch: M ? M[9] : 0,
+    nx:L[1].x, ny:L[1].y, scale:Math.hypot(L[454].x-L[234].x, L[454].y-L[234].y),
+    open:Math.min(e1.open,e2.open), oR:e1.open, oL:e2.open
+  };
+}
+const isOpen = f => !S.openMed || f.open > S.openMed*0.45;
+
+function drawPreview(res, f){
+  const pv=$('preview'), c=pv.getContext('2d'), w=pv.width, h=pv.height, st=$('camStatus');
+  c.save(); c.translate(w,0); c.scale(-1,1); c.drawImage(cam,0,0,w,h); c.restore();
+  if(!f){ st.innerHTML='<span class="warnc">No se detecta el rostro</span>'; return; }
+  const L=res.faceLandmarks[0];
+  c.fillStyle='#2ea043';
+  for(const i of [468,473,33,133,362,263]){ const p=L[i]; c.beginPath(); c.arc((1-p.x)*w, p.y*h, i>=468?3:1.6, 0, 7); c.fill(); }
+  let tip='Posición correcta', cls='ok';
+  if(f.scale<0.18){ tip='Acercate un poco'; cls='warnc'; } else if(f.scale>0.45){ tip='Alejate un poco'; cls='warnc'; }
+  st.innerHTML=`<span class="${cls}">Rostro detectado · ${tip}</span>`;
+}
+
+/* ================= modelo de mirada ================= */
+const FSETS = {
+  A: { name:'ojos (lineal)', f:f=>[f.h,f.v], floor:[.02,.02] },
+  B: { name:'ojos (curvo)', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v], floor:[.02,.02,.005,.005,.005] },
+  C: { name:'ojos + giro de cabeza', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v,f.yaw,f.pitch], floor:[.02,.02,.005,.005,.005,.03,.03], head:true },
+  D: { name:'ojos + cabeza completa', f:f=>[f.h,f.v,f.h*f.h,f.v*f.v,f.h*f.v,f.yaw,f.pitch,f.nx,f.ny,f.scale], floor:[.02,.02,.005,.005,.005,.03,.03,.02,.02,.01], head:true },
+};
+function train(samples, fs='D', lam=0.01){
+  const F=FSETS[fs], X=samples.map(s=>F.f(s.f)), d=X[0].length, n=X.length;
+  const mu=Array(d).fill(0), sd=Array(d).fill(0);
+  X.forEach(x=>x.forEach((v,j)=>mu[j]+=v/n));
+  X.forEach(x=>x.forEach((v,j)=>sd[j]+=(v-mu[j])**2/n));
+  for(let j=0;j<d;j++) sd[j]=Math.max(Math.sqrt(sd[j]), F.floor[j]);
+  const Z=X.map(x=>[1, ...x.map((v,j)=>(v-mu[j])/sd[j])]);
+  return { fs, lam, mu, sd, wx:ridge(Z, samples.map(s=>s.x), lam), wy:ridge(Z, samples.map(s=>s.y), lam) };
+}
+function ridge(Z,y,lam){
+  const n=Z.length, d=Z[0].length, A=[...Array(d)].map(()=>Array(d).fill(0)), b=Array(d).fill(0);
+  for(let i=0;i<n;i++){ const z=Z[i]; for(let j=0;j<d;j++){ b[j]+=z[j]*y[i]; for(let k=0;k<d;k++) A[j][k]+=z[j]*z[k]; } }
+  for(let j=1;j<d;j++) A[j][j]+=lam*n;
+  return solve(A,b);
+}
+function solve(A,b){
+  const n=b.length; const M=A.map((r,i)=>[...r,b[i]]);
+  for(let c=0;c<n;c++){
+    let p=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[p][c])) p=r;
+    [M[c],M[p]]=[M[p],M[c]]; const pv=M[c][c]||1e-12;
+    for(let r=0;r<n;r++){ if(r===c) continue; const k=M[r][c]/pv; for(let j=c;j<=n;j++) M[r][j]-=k*M[c][j]; }
+  }
+  return M.map((r,i)=>r[n]/(r[i]||1e-12));
+}
+function predictWith(m,f){
+  const z=[1, ...FSETS[m.fs].f(f).map((v,j)=>(v-m.mu[j])/m.sd[j])];
+  let x=0,y=0; for(let i=0;i<z.length;i++){ x+=m.wx[i]*z[i]; y+=m.wy[i]*z[i]; }
+  return {x,y};
+}
+S.offset={x:0,y:0};
+function gaze(f, now){
+  if(!f || !isOpen(f) || !S.model) return null;
+  const r=predictWith(S.model,f);
+  return { x:S.filt.x.f(r.x-S.offset.x, now/1000), y:S.filt.y.f(r.y-S.offset.y, now/1000) };
+}
+function moveDot(p){
+  const d=$('gazeDot'); d.style.display='block';
+  if(!p){ d.style.opacity=.25; return; }
+  d.style.opacity=1; d.style.left=clamp(p.x,0,innerWidth)+'px'; d.style.top=clamp(p.y,0,innerHeight)+'px';
+}
+const gazeTol = () => Math.max(150, (S.calErr||80)*1.5);
+
+/* ================= calibración ================= */
+const CAL=[[.06,.08],[.5,.08],[.94,.08],[.94,.5],[.5,.5],[.06,.5],[.06,.92],[.5,.92],[.94,.92],[.27,.29],[.73,.29],[.73,.71],[.27,.71]];
+const VAL=[[.18,.42],[.82,.42],[.82,.8],[.18,.8]];
+
+function tapToContinue(el, html){
+  return new Promise(r=>{
+    el.innerHTML=html; const ov=el.closest('.overlay');
+    const done=()=>{ ov.removeEventListener('pointerup',h); el.innerHTML=''; S.wake=null; r(); };
+    const h=e=>{ if(e.target.closest('.closeBtn')) return; done(); };
+    ov.addEventListener('pointerup',h); S.wake=done;
+  });
+}
+async function target(ov,x,y,dur=1800,skip=700){
+  const d=document.createElement('div'); d.className='target'; d.style.left=x+'px'; d.style.top=y+'px'; ov.appendChild(d);
+  await sleep(30); d.style.transform='scale(.45)';
+  const arr=[]; S.collect={from:performance.now()+skip, arr};
+  await sleep(dur); S.collect=null; d.remove(); return arr;
+}
+function cleanPoint(frames){
+  if(frames.length<6) return frames;
+  const mh=median(frames.map(f=>f.h)), mv=median(frames.map(f=>f.v));
+  const dh=(median(frames.map(f=>Math.abs(f.h-mh)))||1e-3)*1.4826*3, dv=(median(frames.map(f=>Math.abs(f.v-mv)))||1e-3)*1.4826*3;
+  return frames.filter(f=>Math.abs(f.h-mh)<=dh && Math.abs(f.v-mv)<=dv);
+}
+function selectModel(groups, extra){
+  let best=null;
+  for(const fs of ['A','B','C','D']) for(const lam of [0.003,0.03,0.3]){
+    const errs=[];
+    for(let i=0;i<groups.length;i++){
+      const tr=[]; groups.forEach((g,j)=>{ if(j!==i) g.frames.forEach(f=>tr.push({f,x:g.x,y:g.y})); });
+      if(FSETS[fs].head) extra.forEach(s=>tr.push(s));
+      if(tr.length<20 || !groups[i].frames.length) continue;
+      const m=train(tr,fs,lam), ps=groups[i].frames.map(f=>predictWith(m,f));
+      errs.push(Math.hypot(median(ps.map(p=>p.x))-groups[i].x, median(ps.map(p=>p.y))-groups[i].y));
+    }
+    const e=mean(errs); if(e!=null && (!best || e<best.e)) best={fs,lam,e};
+  }
+  return best || {fs:'B',lam:0.03,e:null};
+}
+function setCal(cls, txt){ $('calStatus').innerHTML=`<span class="${cls}">${txt}</span>`; refreshButtons(); }
+function refreshButtons(){
+  $('btnTest').disabled = !(S.model && S.clips.length);
+  $('videoHint').textContent = !S.model ? 'Primero activá la cámara y calibrá.' : !S.clips.length ? 'Cargá al menos un video.' : 'Listo para empezar.';
+  $('btnLive').disabled = !S.model;
+  $('optVtGaze').disabled = !S.model;
+  if(!S.model) $('optVtGaze').checked=false;
+  else if(!S.gazeDefaultSet){ $('optVtGaze').checked=true; S.gazeDefaultSet=true; }
+  $('btnRaw').disabled = $('btnSum').disabled = !S.trials.length;
+}
+
+/* asistente previo: chequea rostro, distancia, centrado, cabeza y luz */
+function calAssistant(){
+  return new Promise(res=>{
+    const msg=$('calMsg');
+    msg.innerHTML=`<div style="font-size:22px;font-weight:700;margin-bottom:6px">Preparación</div>
+      <canvas id="calPrev" width="320" height="180" style="width:320px;max-width:80vw;border-radius:10px;background:#000;display:block;margin:0 auto 10px"></canvas>
+      <div id="calChecks" style="text-align:left;display:inline-block;font-size:16px;line-height:1.8"></div>
+      <div class="sub" style="margin:8px 0 14px">Ojos a la altura del tercio superior de la pantalla · sin reflejos en lentes · apoyá el mentón en la mano si podés</div>
+      <button id="calGo" class="go" style="font-size:18px;padding:14px 26px">Empezar calibración</button>`;
+    const pc=$('calPrev'), px=pc.getContext('2d'); let run=true;
+    if(cam.videoWidth) pc.height=Math.round(pc.width*cam.videoHeight/cam.videoWidth);
+    const tick=()=>{
+      if(!run) return; requestAnimationFrame(tick);
+      const w=pc.width, h=pc.height;
+      px.save(); px.translate(w,0); px.scale(-1,1); px.drawImage(cam,0,0,w,h); px.restore();
+      const f=S.lastF && performance.now()-S.lastFT<500 ? S.lastF : null;
+      let light=null;
+      if(f){ try{ const cx=(1-f.nx)*w, cy=f.ny*h, s=Math.max(10,f.scale*w*0.5); const d=px.getImageData(Math.max(0,cx-s),Math.max(0,cy-s),Math.min(w,2*s),Math.min(h,2*s)).data; let L=0; for(let i=0;i<d.length;i+=16) L+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; light=L/(d.length/16); }catch(e){} }
+      const ck=[
+        ['Rostro detectado', !!f],
+        ['Distancia (40–60 cm)', f && f.scale>=0.18 && f.scale<=0.45, f ? (f.scale<0.18?'acercate':f.scale>0.45?'alejate':'') : ''],
+        ['Cara centrada', f && f.nx>0.33 && f.nx<0.67 && f.ny>0.25 && f.ny<0.75],
+        ['Cabeza derecha, mirando la pantalla', f && Math.abs(f.yaw)<0.18 && Math.abs(f.pitch)<0.2],
+        ['Buena luz en la cara', light!=null && light>70 && light<235, light!=null ? (light<=70?'poca luz':light>=235?'demasiada luz':'') : ''],
+      ];
+      $('calChecks').innerHTML=ck.map(([l,ok,hint])=>`<div><span style="color:${ok?'#2ea043':'#f85149'}">${ok?'✓':'✗'}</span> ${l}${!ok&&hint?` <span class="sub">(${hint})</span>`:''}</div>`).join('');
+    };
+    tick();
+    $('calGo').addEventListener('pointerup', e=>{ e.stopPropagation(); run=false; msg.innerHTML=''; res(); }, {once:true});
+  });
+}
+
+/* pantalla de resultado: dónde estaba cada punto y dónde lo estimó la app */
+function calResultScreen(val, errPx, pct, q, modelName){
+  return new Promise(res=>{
+    const ov=$('calib'), c=document.createElement('canvas'), d=devicePixelRatio||1, W=innerWidth, H=innerHeight;
+    c.width=W*d; c.height=H*d; c.style.cssText='position:absolute;inset:0;width:100%;height:100%'; ov.appendChild(c);
+    const x=c.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.fillStyle='#111'; x.fillRect(0,0,W,H);
+    val.forEach(v=>{
+      x.strokeStyle='rgba(255,255,255,.35)'; x.lineWidth=2; x.beginPath(); x.moveTo(v.x,v.y); x.lineTo(v.px,v.py); x.stroke();
+      x.strokeStyle='#fff'; x.lineWidth=3; x.beginPath(); x.arc(v.x,v.y,14,0,7); x.stroke();
+      x.fillStyle='#ffd33d'; x.beginPath(); x.arc(v.px,v.py,8,0,7); x.fill();
+    });
+    const tol=errPx||0; x.strokeStyle='rgba(46,160,67,.25)'; x.setLineDash([6,6]);
+    val.forEach(v=>{ x.beginPath(); x.arc(v.x,v.y,Math.max(30,W*0.04),0,7); x.stroke(); }); x.setLineDash([]);
+    const msg=$('calMsg');
+    msg.style.top='22%';
+    msg.innerHTML=`<div style="font-size:26px;font-weight:700;color:${q[2]}">Calibración ${q[1]}</div>
+      <div class="sub" style="margin-top:6px">Error medio ≈ ${Math.round(errPx)} px · ${pct.toFixed(1)}% de la pantalla · modelo: ${modelName}</div>
+      <div class="sub" style="margin-top:4px">○ blanco = punto real · ● amarillo = dónde lo estimó la app</div>
+      ${q[0]==='badc'?'<div class="sub" style="margin-top:8px;color:#d29922">Para mejorar: más luz de frente, cabeza quieta (mentón apoyado), pantalla a 40–60 cm y mirar el centro exacto de cada punto.</div>':''}
+      <div class="row" style="justify-content:center;margin-top:16px"><button id="calRedo" class="sec" style="font-size:17px">Repetir</button><button id="calOk" class="go" style="font-size:17px">Usar esta calibración</button></div>`;
+    const done=v=>{ c.remove(); msg.innerHTML=''; msg.style.top=''; res(v); };
+    $('calRedo').addEventListener('pointerup',e=>{ e.stopPropagation(); done('redo'); },{once:true});
+    $('calOk').addEventListener('pointerup',e=>{ e.stopPropagation(); done('ok'); },{once:true});
+  });
+}
+
+$('btnCal').addEventListener('click', runCalibration);
+async function runCalibration(){
+  const ov=$('calib'), msg=$('calMsg'); ov.classList.add('on');
+  await sleep(150);
+  await calAssistant();
+  await tapToContinue(msg,'Mantené la cabeza quieta y seguí el punto rojo <b>solo con la mirada</b>, mirando su centro blanco.<br><br><span class="sub">13 puntos · ~30 segundos · Tocá para empezar</span>');
+  const W=innerWidth, H=innerHeight, raw=[];
+  for(const [px,py] of CAL){ const x=px*W, y=py*H; raw.push({x,y,frames:await target(ov,x,y)}); }
+  await tapToContinue(msg,'Ahora mirá fijo el punto del centro y <b>mové suavemente la cabeza</b> (arriba, abajo, a los costados) sin dejar de mirarlo.<br><br><span class="sub">Tocá para seguir</span>');
+  const headRaw=await target(ov,W/2,H/2,3500,400);
+  const allFrames=raw.flatMap(g=>g.frames);
+  if(allFrames.length<80){ ov.classList.remove('on'); setCal('badc','No se detectó bien el rostro durante la calibración. Revisá luz y posición y repetí.'); return; }
+  S.openMed=median(allFrames.map(f=>f.open));
+  const groups=raw.map(g=>({ x:g.x, y:g.y, frames:cleanPoint(g.frames.filter(isOpen)) })).filter(g=>g.frames.length>=4);
+  const extra=headRaw.filter(isOpen).filter((f,i)=>i%2===0).map(f=>({f,x:W/2,y:H/2}));
+  msg.innerHTML='<div class="sub">Calculando el mejor modelo…</div>'; await sleep(30);
+  const best=selectModel(groups, extra);
+  const base=groups.flatMap(g=>g.frames.map(f=>({f,x:g.x,y:g.y})));
+  const trainSet=s=>FSETS[best.fs].head ? s.concat(extra) : s;
+  const model=train(trainSet(base), best.fs, best.lam);
+  msg.innerHTML='';
+  await tapToContinue(msg,'Último paso: validación. Mirá los 4 puntos.<br><br><span class="sub">Tocá para seguir</span>');
+  const val=[], vs=[];
+  for(const [px,py] of VAL){
+    const x=px*W, y=py*H, a=cleanPoint((await target(ov,x,y)).filter(isOpen));
+    if(a.length<4) continue;
+    const ps=a.map(f=>predictWith(model,f)), p={x:median(ps.map(q=>q.x)), y:median(ps.map(q=>q.y))};
+    val.push({x,y,px:p.x,py:p.y,err:Math.hypot(p.x-x,p.y-y)}); a.forEach(f=>vs.push({f,x,y}));
+  }
+  const err=val.length?mean(val.map(v=>v.err)):(best.e||null);
+  const pct=err!=null?100*err/Math.hypot(W,H):99;
+  const q = pct<4 ? ['ok','buena','#2ea043'] : pct<7 ? ['warnc','aceptable','#d29922'] : ['badc','mejorable','#f85149'];
+  const choice=await calResultScreen(val, err||0, pct, q, FSETS[best.fs].name);
+  if(choice==='redo'){ await sleep(100); return runCalibration(); }
+  S.model=train(trainSet(base.concat(vs)), best.fs, best.lam);
+  S.calibSize={w:W,h:H}; S.calErr=err; S.calPct=pct; S.offset={x:0,y:0};
+  ov.classList.remove('on');
+  setCal(q[0], `Calibración ${q[1]} · error ≈ ${Math.round(err)} px (${pct.toFixed(1)}% de la pantalla) · modelo: ${FSETS[best.fs].name}`);
+  if(S.tab==='tests') renderTestCards();
+}
+const sizeChanged = () => S.calibSize && Math.abs(S.calibSize.w-innerWidth)>40;
+addEventListener('resize', ()=>{ if(sizeChanged()) setCal('warnc','Cambió la orientación o el tamaño de la pantalla: recalibrá antes de usar la mirada.'); });
+
+$('btnLive').addEventListener('click', ()=>{
+  const ov=$('live'); ov.querySelectorAll('.ref').forEach(e=>e.remove());
+  for(const [px,py] of CAL){ const d=document.createElement('div'); d.className='ref'; d.style.left=px*100+'%'; d.style.top=py*100+'%'; ov.appendChild(d); }
+  ov.classList.add('on'); newFilter(); S.mode='live';
+});
+$('btnLiveExit').addEventListener('click', ()=>{ S.mode='idle'; $('live').classList.remove('on'); $('gazeDot').style.display='none'; });
+
+/* ================= videos ================= */
+$('optDecision').addEventListener('change', e=>{ $('decBox').style.display = e.target.checked ? 'grid' : 'none'; });
+$('btnClips').addEventListener('click', ()=>$('fileClips').click());
+$('fileClips').addEventListener('change', e=>{
+  for(const f of e.target.files) S.clips.push({ name:f.name.replace(/\.[^.]+$/,''), url:URL.createObjectURL(f) });
+  e.target.value=''; renderClips();
+});
+function renderClips(){
+  const el=$('clipList');
+  if(!S.clips.length){ el.textContent='Ningún video cargado'; refreshButtons(); return; }
+  el.innerHTML = S.clips.map((c,i)=>`<div class="clip"><span>${i+1}. ${esc(c.name)}</span><button class="sec" data-i="${i}">Quitar</button></div>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ S.clips.splice(+b.dataset.i,1); renderClips(); }));
+  refreshButtons();
+}
+function contentRect(v){
+  const r=v.getBoundingClientRect(), ar=v.videoWidth/v.videoHeight;
+  let w=r.width, h=w/ar; if(h>r.height){ h=r.height; w=h*ar; }
+  return { x:r.left+(r.width-w)/2, y:r.top+(r.height-h)/2, w, h };
+}
+function recordTest(f, now){
+  const tv=$('testVideo'), tr=S.trial; if(!tr || tv.paused) return;
+  const p=gaze(f, now);
+  if(!p){ tr.samples.push({ t:now, vt:tv.currentTime, valid:false }); if(S.showDot) moveDot(null); return; }
+  const x=p.x-S.drift.x, y=p.y-S.drift.y, r=contentRect(tv);
+  tr.samples.push({ t:now, vt:tv.currentTime, x, y, u:(x-r.x)/r.w, v:(y-r.y)/r.h, valid:true });
+  if(S.showDot) moveDot({x,y});
+}
+function askDecision(q, opts){
+  return new Promise(r=>{
+    const d=$('decision');
+    d.innerHTML=`<div class="dq">${esc(q)}</div><div class="row" style="justify-content:center">`+opts.map(o=>`<button data-o="${esc(o)}">${esc(o)}</button>`).join('')+'</div>';
+    d.style.display='block';
+    const done=v=>{ d.style.display='none'; d.innerHTML=''; S.wake=null; r(v); };
+    d.querySelectorAll('button').forEach(b=>b.addEventListener('pointerup',e=>{ e.stopPropagation(); done(b.dataset.o); }));
+    S.wake=()=>done(null);
+  });
+}
+$('btnAbort').addEventListener('pointerup', e=>{ e.stopPropagation(); S.abort=true; $('testVideo').pause(); if(S.wake) S.wake(); });
+
+$('btnTest').addEventListener('click', runVideoTest);
+async function runVideoTest(){
+  if(sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes de empezar.'); return; }
+  const ov=$('test'), tv=$('testVideo'), msg=$('testMsg');
+  const opts=$('decOptions').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const decOn=$('optDecision').checked && opts.length, question=$('decQuestion').value.trim()||'¿Qué decisión tomarías?';
+  const athlete=curAthlete();
+  S.abort=false; S.showDot=$('optDot').checked; ov.classList.add('on');
+  for(let i=0; i<S.clips.length && !S.abort; i++){
+    const clip=S.clips[i];
+    tv.style.visibility='hidden';
+    await tapToContinue(msg, `Video ${i+1} de ${S.clips.length}<br><span class="sub">Mirá el video con atención. Tocá para empezar</span>`);
+    if(S.abort) break;
+    S.drift={x:0,y:0};
+    if($('optDrift').checked){
+      msg.innerHTML='<div style="font-size:80px;font-weight:200;line-height:1">+</div>';
+      const arr=[]; S.collect={from:performance.now()+400, arr}; await sleep(1300); S.collect=null; msg.innerHTML='';
+      const ps=arr.filter(isOpen).map(f=>predictWith(S.model,f));
+      if(ps.length>=8){
+        let dx=median(ps.map(p=>p.x))-innerWidth/2, dy=median(ps.map(p=>p.y))-innerHeight/2;
+        const m=Math.hypot(dx,dy), lim=160; if(m>lim){ dx*=lim/m; dy*=lim/m; }
+        S.drift={x:dx,y:dy};
+      }
+    }
+    tv.src=clip.url;
+    const ok = await new Promise(r=>{
+      if(tv.readyState>=1) return r(true);
+      tv.onloadedmetadata=()=>r(true); tv.onerror=()=>r(false);
+      setTimeout(()=>r(tv.readyState>=1), 8000);
+    });
+    if(!ok){ await tapToContinue(msg, `<span class="badc">No se pudo abrir «${esc(clip.name)}».</span><br><span class="sub">Este navegador no reproduce ese formato. Convertilo a MP4 (H.264) o MOV. Tocá para seguir.</span>`); continue; }
+    tv.currentTime=0; tv.style.visibility='visible';
+    const tr={ athlete, clip:clip.name, url:clip.url, date:new Date(), calErr:S.calErr, drift:{...S.drift},
+      samples:[], decision:null, question:decOn?question:null, rt:null, duration:tv.duration, fix:[] };
+    newFilter(); S.trial=tr; S.mode='test';
+    const ended=new Promise(r=>{ tv.onended=r; S.wake=r; });
+    try { await tv.play(); } catch(e){ alert('No se pudo reproducir el video: '+e.message); S.abort=true; }
+    if(!S.abort) await ended;
+    S.mode='idle'; S.trial=null; S.wake=null; $('gazeDot').style.display='none';
+    if(S.abort) break;
+    if(decOn){ const t0=performance.now(); tr.decision=await askDecision(question, opts); tr.rt=tr.decision ? (performance.now()-t0)/1000 : null; }
+    tr.fix=fixations(tr.samples);
+    S.trials.push(tr);
+  }
+  tv.pause(); tv.removeAttribute('src'); tv.load();
+  ov.classList.remove('on'); S.mode='idle'; msg.innerHTML='';
+  refreshButtons();
+  if(S.trials.length) showTab('results');
+}
+
+function fixations(samples, disp=100, minDur=100, maxGap=150){
+  const s=samples.filter(p=>p.valid), out=[];
+  const D=(a,b)=>{ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; for(let k=a;k<=b;k++){ const p=s[k]; x0=Math.min(x0,p.x); x1=Math.max(x1,p.x); y0=Math.min(y0,p.y); y1=Math.max(y1,p.y); } return (x1-x0)+(y1-y0); };
+  const gap=(a,b)=>{ for(let k=a+1;k<=b;k++) if(s[k].t-s[k-1].t>maxGap) return true; return false; };
+  let i=0;
+  while(i<s.length){
+    let j=i; while(j<s.length && s[j].t-s[i].t<minDur) j++;
+    if(j>=s.length) break;
+    if(D(i,j)<=disp && !gap(i,j)){
+      while(j+1<s.length && s[j+1].t-s[j].t<=maxGap && D(i,j+1)<=disp) j++;
+      const g=s.slice(i,j+1);
+      out.push({ x:mean(g.map(p=>p.x)), y:mean(g.map(p=>p.y)), u:mean(g.map(p=>p.u)), v:mean(g.map(p=>p.v)), vt:s[i].vt, dur:s[j].t-s[i].t });
+      i=j+1;
+    } else i++;
+  }
+  return out;
+}
+const validPct = t => t.samples.length ? 100*t.samples.filter(s=>s.valid).length/t.samples.length : 0;
+
+/* ================= render compartido (análisis y PDF) ================= */
+function heatColor(v){
+  const st=[[0,[30,90,255]],[.35,[0,220,200]],[.55,[60,220,60]],[.75,[255,220,0]],[1,[255,40,20]]];
+  for(let i=1;i<st.length;i++) if(v<=st[i][0]){ const [a,ca]=st[i-1], [b,cb]=st[i], t=(v-a)/(b-a); return ca.map((c,j)=>Math.round(c+(cb[j]-c)*t)); }
+  return st.at(-1)[1];
+}
+function buildHeat(pts,W,H,focus=false){
+  const cs=4, gw=Math.max(1,Math.ceil(W/cs)), gh=Math.max(1,Math.ceil(H/cs)), g=new Float32Array(gw*gh);
+  const sig=Math.max(gw,gh)*0.035, rad=Math.ceil(sig*3), k=[];
+  for(let dy=-rad;dy<=rad;dy++) for(let dx=-rad;dx<=rad;dx++){ const w=Math.exp(-(dx*dx+dy*dy)/(2*sig*sig)); if(w>0.01) k.push(dx,dy,w); }
+  for(const p of pts){
+    if(p.u<0||p.u>1||p.v<0||p.v>1) continue;
+    const cx=Math.round(p.u*gw), cy=Math.round(p.v*gh);
+    for(let i=0;i<k.length;i+=3){ const x=cx+k[i], y=cy+k[i+1]; if(x>=0&&y>=0&&x<gw&&y<gh) g[y*gw+x]+=k[i+2]; }
+  }
+  let mx=0; for(const v of g) if(v>mx) mx=v;
+  const c=document.createElement('canvas'); c.width=gw; c.height=gh;
+  const cx2=c.getContext('2d'), img=cx2.createImageData(gw,gh);
+  for(let i=0;i<g.length;i++){
+    const v=mx?g[i]/mx:0;
+    if(focus){ img.data[i*4+3]=Math.round(235*Math.pow(1-Math.min(1,v*1.6),1.5)); continue; }
+    if(v<0.04) continue;
+    const [R,G,B]=heatColor(v); img.data[i*4]=R; img.data[i*4+1]=G; img.data[i*4+2]=B; img.data[i*4+3]=Math.round(Math.min(1,0.25+v)*200);
+  }
+  cx2.putImageData(img,0,0); return { c, w:Math.round(W), focus };
+}
+const P = (r,u,v) => [r.x+u*r.w, r.y+v*r.h];
+const PCOL=['31,111,235','46,160,67','248,81,73','210,153,34','163,113,247','56,189,248','244,114,182','255,255,255'];
+function renderPath(X, r, fx, s, col='31,111,235'){
+  if(!fx.length) return;
+  X.strokeStyle=`rgba(${col},.8)`; X.lineWidth=2*s;
+  X.beginPath(); fx.forEach((f,i)=>{ const [x,y]=P(r,f.u,f.v); i?X.lineTo(x,y):X.moveTo(x,y); }); X.stroke();
+  X.font=`600 ${12*s}px -apple-system,sans-serif`; X.textAlign='center'; X.textBaseline='middle';
+  fx.forEach((f,i)=>{
+    const [x,y]=P(r,f.u,f.v), rad=(6+Math.sqrt(f.dur)*0.9)*s;
+    X.fillStyle=`rgba(${col},.6)`; X.strokeStyle='#fff';
+    X.beginPath(); X.arc(x,y,rad,0,7); X.fill(); X.stroke();
+    X.fillStyle='#fff'; X.fillText(i+1, x, y);
+  });
+}
+function renderAOIs(X, r, list, t, s, drag){
+  X.font=`600 ${13*s}px -apple-system,sans-serif`; X.textAlign='left'; X.textBaseline='top';
+  const rect=(a,dash)=>{ const [x,y]=P(r,a.x,a.y); X.setLineDash(dash?[6*s,4*s]:[]); X.strokeStyle='#ffd33d'; X.lineWidth=2*s;
+    X.fillStyle='rgba(255,211,61,.12)'; X.fillRect(x,y,a.w*r.w,a.h*r.h); X.strokeRect(x,y,a.w*r.w,a.h*r.h); X.setLineDash([]); return [x,y]; };
+  list.forEach(a=>{
+    const [x,y]=rect(a,false), st=aoiStats(t,a), label=`${a.name} · ${fmt(st.dwell,0)}%`;
+    const tw=X.measureText(label).width;
+    X.fillStyle='rgba(13,17,23,.85)'; X.fillRect(x,y,tw+10*s,20*s);
+    X.fillStyle='#ffd33d'; X.fillText(label, x+5*s, y+3*s);
+  });
+  if(drag) rect(drag,true);
+}
+function aoiStats(t,a){
+  const vs=t.samples.filter(s=>s.valid), inA=s=>s.u>=a.x&&s.u<=a.x+a.w&&s.v>=a.y&&s.v<=a.y+a.h;
+  const fx=t.fix.filter(inA);
+  return { dwell: vs.length ? 100*vs.filter(inA).length/vs.length : 0, ttff: fx.length ? fx[0].vt : null, nfix: fx.length };
+}
+
+/* ================= análisis de un video ================= */
+const av=$('aVideo'), ac=$('aCanvas'), actx=ac.getContext('2d');
+const A={ t:null, mode:'replay', heat:null, drag:null, seeking:false };
+const aoisOf = t => (S.aois[t.clip] ||= []);
+const peersOf = t => S.trials.filter(o=>o.clip===t.clip);
+$('optAgg').addEventListener('change', ()=>{ A.heat=null; });
+
+function openAnalysis(i){
+  A.t=S.trials[i]; A.heat=null; setMode('replay');
+  const peers=peersOf(A.t);
+  $('aggWrap').style.display = peers.length>1 ? 'flex' : 'none';
+  $('optAgg').checked=false;
+  $('aggLabel').textContent=`Mostrar los ${peers.length} análisis de este video (${[...new Set(peers.map(p=>p.athlete))].join(', ')})`;
+  $('home').style.display='none'; $('analysis').style.display='block'; scrollTo(0,0);
+  av.src=A.t.url; av.onloadeddata=()=>{ av.currentTime=0.01; };
+  $('aTitle').textContent=A.t.athlete+' · '+A.t.clip;
+  $('aSub').textContent=A.t.date.toLocaleString('es-AR');
+  renderMetrics(); requestAnimationFrame(aLoop);
+}
+$('btnBack').addEventListener('click', ()=>{ av.pause(); $('analysis').style.display='none'; $('home').style.display='block'; showTab('results'); });
+function aLoop(){
+  if($('analysis').style.display==='none') return;
+  requestAnimationFrame(aLoop);
+  if(av.duration && !A.seeking) $('aSeek').value=Math.round(av.currentTime/av.duration*1000);
+  $('aPlay').textContent = av.paused ? '▶︎' : '❚❚';
+  draw();
+}
+$('aPlay').addEventListener('click', ()=> av.paused ? av.play() : av.pause());
+const seek=$('aSeek');
+seek.addEventListener('pointerdown', ()=>A.seeking=true);
+seek.addEventListener('pointerup', ()=>A.seeking=false);
+seek.addEventListener('input', e=>{ if(av.duration) av.currentTime=e.target.value/1000*av.duration; });
+$('aModes').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+function setMode(m){
+  A.mode=m; $('aModes').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.m===m));
+  $('aoiHint').style.display = m==='aoi' ? 'block' : 'none';
+}
+function sizeCanvas(){
+  const r=ac.getBoundingClientRect(), dpr=devicePixelRatio||1, w=Math.round(r.width*dpr), h=Math.round(r.height*dpr);
+  if(ac.width!==w || ac.height!==h){ ac.width=w; ac.height=h; A.heat=null; }
+  return dpr;
+}
+function vrect(){
+  const W=ac.width, H=ac.height, ar=(av.videoWidth||16)/(av.videoHeight||9);
+  let w=W, h=W/ar; if(h>H){ h=H; w=H*ar; }
+  return { x:(W-w)/2, y:(H-h)/2, w, h };
+}
+function draw(){
+  if(!A.t) return;
+  const dpr=sizeCanvas(), r=vrect(); actx.clearRect(0,0,ac.width,ac.height);
+  if(A.mode==='replay') drawReplay(r,dpr);
+  else if(A.mode==='heat' || A.mode==='focus'){
+    const focus=A.mode==='focus', agg=$('optAgg').checked;
+    if(!A.heat || A.heat.w!==Math.round(r.w) || A.heat.focus!==focus || A.heat.agg!==agg){
+      const src=agg?peersOf(A.t):[A.t];
+      A.heat=buildHeat(src.flatMap(t=>t.samples.filter(s=>s.valid)), r.w, r.h, focus); A.heat.agg=agg;
+    }
+    actx.imageSmoothingEnabled=true; actx.drawImage(A.heat.c, r.x, r.y, r.w, r.h);
+  }
+  else if(A.mode==='path'){
+    if($('optAgg').checked){
+      const peers=peersOf(A.t);
+      peers.forEach((t,i)=>renderPath(actx, r, t.fix, dpr, PCOL[i%PCOL.length]));
+      actx.font=`600 ${13*dpr}px -apple-system,sans-serif`; actx.textAlign='left'; actx.textBaseline='top';
+      peers.forEach((t,i)=>{ actx.fillStyle='rgba(13,17,23,.8)'; actx.fillRect(8*dpr,(8+i*22)*dpr,190*dpr,20*dpr); actx.fillStyle=`rgb(${PCOL[i%PCOL.length]})`; actx.fillText('● '+t.athlete,14*dpr,(11+i*22)*dpr); });
+    } else renderPath(actx, r, A.t.fix, dpr);
+  }
+  else renderAOIs(actx, r, aoisOf(A.t), A.t, dpr, A.drag ? normRect(A.drag) : null);
+}
+function drawReplay(r,dpr){
+  const ct=av.currentTime, pts=A.t.samples.filter(s=>s.valid && s.vt<=ct && s.vt>=ct-0.5);
+  if(!pts.length) return;
+  actx.lineWidth=3*dpr; actx.lineCap='round';
+  for(let i=1;i<pts.length;i++){
+    actx.strokeStyle=`rgba(255,211,61,${(i/pts.length)*0.8})`;
+    actx.beginPath(); actx.moveTo(...P(r,pts[i-1].u,pts[i-1].v)); actx.lineTo(...P(r,pts[i].u,pts[i].v)); actx.stroke();
+  }
+  const [x,y]=P(r,pts.at(-1).u,pts.at(-1).v);
+  actx.fillStyle='rgba(255,211,61,.3)'; actx.strokeStyle='#ffd33d'; actx.lineWidth=3*dpr;
+  actx.beginPath(); actx.arc(x,y,16*dpr,0,7); actx.fill(); actx.stroke();
+}
+const normRect = d => ({ x:Math.min(d.u0,d.u1), y:Math.min(d.v0,d.v1), w:Math.abs(d.u1-d.u0), h:Math.abs(d.v1-d.v0) });
+function toUV(e){ const b=ac.getBoundingClientRect(), dpr=devicePixelRatio||1, r=vrect();
+  return [clamp(((e.clientX-b.left)*dpr-r.x)/r.w,0,1), clamp(((e.clientY-b.top)*dpr-r.y)/r.h,0,1)]; }
+ac.addEventListener('pointerdown', e=>{
+  if(A.mode!=='aoi'){ av.paused?av.play():av.pause(); return; }
+  const [u,v]=toUV(e); A.drag={u0:u,v0:v,u1:u,v1:v}; ac.setPointerCapture(e.pointerId);
+});
+ac.addEventListener('pointermove', e=>{ if(!A.drag) return; const [u,v]=toUV(e); A.drag.u1=u; A.drag.v1=v; });
+ac.addEventListener('pointerup', ()=>{
+  if(!A.drag) return; const a=normRect(A.drag); A.drag=null;
+  if(a.w<0.02 || a.h<0.02) return;
+  const name=prompt('Nombre de la zona:'); if(!name) return;
+  aoisOf(A.t).push({ name:name.trim(), ...a }); renderMetrics();
+});
+function renderMetrics(){
+  const t=A.t, fx=t.fix, list=aoisOf(t);
+  const kpi=(v,l)=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
+  let h='<div class="kpis">'+
+    kpi(fx.length,'fijaciones')+
+    kpi(fx.length?Math.round(mean(fx.map(f=>f.dur)))+' ms':'—','duración media')+
+    kpi(t.duration?fmt(fx.length/t.duration,2):'—','fijaciones / s')+
+    kpi(Math.round(validPct(t))+'%','muestras válidas')+
+    (t.question ? kpi(t.decision?esc(t.decision):'—', t.rt?`respuesta · ${t.rt.toFixed(2)} s`:'respuesta') : '')+
+    kpi(t.calErr!=null?Math.round(t.calErr)+' px':'—','error de calibración')+'</div>';
+  h+='<div style="font-weight:600">Zonas de interés</div>';
+  if(!list.length) h+='<div class="status">Sin zonas. Entrá en «Zonas» y arrastrá sobre el video.</div>';
+  else h+='<table><tr><th>Zona</th><th>Permanencia</th><th>1ª fijación</th><th>Fijaciones</th><th></th></tr>'+
+    list.map((a,i)=>{ const s=aoiStats(t,a); return `<tr><td>${esc(a.name)}</td><td>${fmt(s.dwell,0)}%</td><td>${s.ttff!=null?s.ttff.toFixed(2)+' s':'—'}</td><td>${s.nfix}</td><td><button class="sec" style="padding:4px 10px;font-size:13px" data-i="${i}">✕</button></td></tr>`; }).join('')+'</table>';
+  const peers=peersOf(t);
+  if(peers.length>1){
+    h+='<div style="font-weight:600;margin-top:16px">Comparación entre jugadores</div><div class="tblwrap"><table><tr><th>Jugador</th><th>Fijaciones</th><th>Dur. media</th>'+
+      list.map(a=>`<th>${esc(a.name)}<br><span style="font-weight:400">perm. · 1ª fij.</span></th>`).join('')+'</tr>'+
+      peers.map(p=>`<tr${p===t?' style="color:var(--y,#ffd33d)"':''}><td>${esc(p.athlete)}</td><td>${p.fix.length}</td><td>${p.fix.length?Math.round(mean(p.fix.map(f=>f.dur)))+' ms':'—'}</td>`+
+        list.map(a=>{ const s=aoiStats(p,a); return `<td>${fmt(s.dwell,0)}% · ${s.ttff!=null?s.ttff.toFixed(2)+' s':'—'}</td>`; }).join('')+'</tr>').join('')+
+      `<tr><td><b>Promedio</b></td><td>${fmt(mean(peers.map(p=>p.fix.length)),1)}</td><td>${fmt(mean(peers.filter(p=>p.fix.length).map(p=>mean(p.fix.map(f=>f.dur)))),0)} ms</td>`+
+        list.map(a=>{ const ss=peers.map(p=>aoiStats(p,a)), tt=ss.map(s=>s.ttff).filter(v=>v!=null); return `<td><b>${fmt(mean(ss.map(s=>s.dwell)),0)}% · ${tt.length?mean(tt).toFixed(2)+' s':'—'}</b></td>`; }).join('')+'</tr></table></div>';
+    if(!list.length) h+='<div class="status">Marcá zonas para comparar la atención de cada jugador.</div>';
+  }
+  $('aMetrics').innerHTML=h;
+  $('aMetrics').querySelectorAll('button[data-i]').forEach(b=>b.addEventListener('click',()=>{ list.splice(+b.dataset.i,1); renderMetrics(); }));
+}
+
+/* ================= motor de tests visuales ================= */
+const ABORT = new Error('abort');
+const C = { bg:'#0b0f14', fg:'#e6edf3', mut:'#8b949e', go:'#2ea043', bad:'#f85149', warn:'#d29922', acc:'#1f6feb', y:'#ffd33d', ball:'#58a6ff' };
+const VT = { W:0, H:0, tapCb:null, cancel:null, abort:false, gaze:[], lastGaze:null, useGaze:false, face:[], snaps:[] };
+const vtc=$('vtc'), X=vtc.getContext('2d');
+function vtSetup(){ const d=devicePixelRatio||1; VT.W=innerWidth; VT.H=innerHeight; vtc.width=Math.round(VT.W*d); vtc.height=Math.round(VT.H*d); X.setTransform(d,0,0,d,0,0); }
+vtc.addEventListener('pointerdown', e=>{ e.preventDefault(); if(VT.tapCb) VT.tapCb({ x:e.clientX, y:e.clientY, t:performance.now() }); });
+$('btnVtExit').addEventListener('pointerup', e=>{ e.stopPropagation(); VT.abort=true; if(VT.cancel) VT.cancel(); });
+function vtWait(ms, tap){
+  return new Promise((res,rej)=>{
+    if(VT.abort){ rej(ABORT); return; }
+    let to=null; const end=()=>{ if(to) clearTimeout(to); VT.tapCb=null; VT.cancel=null; };
+    if(ms!=null) to=setTimeout(()=>{ end(); res(null); }, ms);
+    if(tap) VT.tapCb=p=>{ end(); res(p); };
+    VT.cancel=()=>{ end(); rej(ABORT); };
+  });
+}
+async function waitIgnoring(ms){
+  const end=performance.now()+ms; let taps=0;
+  while(true){ const left=end-performance.now(); if(left<=0) break; if(await vtWait(left,true)) taps++; else break; }
+  return taps;
+}
+const frame = () => new Promise((res,rej)=>requestAnimationFrame(()=> VT.abort ? rej(ABORT) : res(performance.now())));
+const FONT = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+function clr(){ X.fillStyle=C.bg; X.fillRect(0,0,VT.W,VT.H); }
+function txt(s,x,y,size=22,color=C.fg,align='center',weight=600){ X.fillStyle=color; X.font=`${weight} ${size}px ${FONT}`; X.textAlign=align; X.textBaseline='middle'; X.fillText(s,x,y); }
+function dot(x,y,r,color){ X.fillStyle=color; X.beginPath(); X.arc(x,y,r,0,Math.PI*2); X.fill(); }
+function ring(x,y,r,color,w=3){ X.strokeStyle=color; X.lineWidth=w; X.beginPath(); X.arc(x,y,r,0,Math.PI*2); X.stroke(); }
+function cross(x,y,s=14){ X.strokeStyle=C.fg; X.lineWidth=3; X.beginPath(); X.moveTo(x-s,y); X.lineTo(x+s,y); X.moveTo(x,y-s); X.lineTo(x,y+s); X.stroke(); }
+function hud(s){ txt(s, VT.W-18, 28, 15, C.mut, 'right', 600); }
+function wrap(text, maxW, size){
+  X.font=`500 ${size}px ${FONT}`; const words=text.split(' '), out=[]; let line='';
+  for(const w of words){ const t=line?line+' '+w:w; if(X.measureText(t).width>maxW && line){ out.push(line); line=w; } else line=t; }
+  if(line) out.push(line); return out;
+}
+async function intro(title, lines){
+  const cx=VT.W/2, maxW=Math.min(VT.W*0.82, 640);
+  const all=lines.flatMap(l=>wrap(l,maxW,19));
+  const total=46+all.length*30; let y=VT.H/2-total/2;
+  clr(); if(VT.stepLabel) txt(VT.stepLabel,cx,y-48,14,C.acc,'center',800); txt(title,cx,y,32,C.fg,'center',700); y+=56;
+  all.forEach(l=>{ txt(l,cx,y,19,C.mut,'center',500); y+=30; });
+  txt('Tocá la pantalla para empezar', cx, VT.H-50, 18, C.acc, 'center', 700);
+  await vtWait(null,true);
+}
+async function countdown(){ for(const n of [3,2,1]){ clr(); txt(String(n),VT.W/2,VT.H/2,96,C.fg,'center',300); await vtWait(650); } }
+function mkRes(key, lv, main, metrics, detail={}){
+  return { id:Date.now().toString(36)+key, key, name:TESTS[key].name, athlete:curAthlete(), date:new Date().toISOString(), level:lv, gaze:VT.useGaze, main, metrics, detail };
+}
+
+/* ---------- 1. Tiempo de reacción ---------- */
+async function tReact(lv){
+  const N=[10,15,20][lv-1], cx=VT.W/2, cy=VT.H/2, R=Math.min(VT.W,VT.H)*0.13;
+  await intro('Tiempo de reacción',['Mirá el punto central.','Cuando aparezca el círculo verde, tocá la pantalla lo más rápido posible.','Si tocás antes de tiempo cuenta como anticipación.']);
+  await countdown();
+  const rts=[]; let antic=0, miss=0;
+  for(let i=0;i<N;){
+    clr(); dot(cx,cy,4,C.mut); hud(`${i+1} / ${N}`);
+    if(await vtWait(rand(1200,3500),true)){ antic++; clr(); txt('Anticipado: esperá el círculo verde',cx,cy,24,C.bad); await vtWait(900); continue; }
+    clr(); dot(cx,cy,R,C.go); hud(`${i+1} / ${N}`);
+    const t0=await frame();
+    const tap=await vtWait(1500,true);
+    clr();
+    if(tap){ const rt=tap.t-t0; rts.push(rt); txt(Math.round(rt)+' ms',cx,cy,42); } else { miss++; txt('Sin respuesta',cx,cy,28,C.warn); }
+    await vtWait(700); i++;
+  }
+  const med=median(rts);
+  return mkRes('react',lv,{label:'Reacción (mediana)',value:med,unit:'ms',dec:0,better:'low'},[
+    ['Mediana',med,'ms',0],['Media',mean(rts),'ms',0],['Mejor',rts.length?Math.min(...rts):null,'ms',0],
+    ['Variabilidad (DE)',sdev(rts),'ms',0],['Anticipaciones',antic,'',0],['Omisiones',miss,'',0]]);
+}
+
+/* ---------- 2. Go / No-Go ---------- */
+async function tGoNoGo(lv){
+  const N=[30,40,60][lv-1], dur=[800,650,500][lv-1], isi=[1000,850,700][lv-1];
+  const cx=VT.W/2, cy=VT.H/2, R=Math.min(VT.W,VT.H)*0.13;
+  await intro('Go / No-Go',['Círculo VERDE: tocá la pantalla lo más rápido posible.','Círculo ROJO: NO toques.','Mantené la concentración hasta el final.']);
+  await countdown();
+  const nGo=Math.round(N*0.75), seq=shuffle([...Array(nGo).fill(1),...Array(N-nGo).fill(0)]);
+  const rts=[]; let om=0, com=0, antic=0;
+  for(let i=0;i<N;i++){
+    clr(); dot(cx,cy,4,C.mut); hud(`${i+1} / ${N}`);
+    antic += await waitIgnoring(isi+rand(-150,150));
+    clr(); dot(cx,cy,R,seq[i]?C.go:C.bad); hud(`${i+1} / ${N}`);
+    const t0=await frame();
+    const tap=await vtWait(dur,true);
+    if(seq[i]){ if(tap) rts.push(tap.t-t0); else om++; } else if(tap) com++;
+  }
+  const acc=100*(N-om-com)/N;
+  return mkRes('gonogo',lv,{label:'Precisión',value:acc,unit:'%',dec:0,better:'high'},[
+    ['Precisión',acc,'%',0],['Reacción media (verde)',mean(rts),'ms',0],
+    ['Omisiones',100*om/nGo,'%',0],['Errores de comisión (rojo)',100*com/(N-nGo),'%',0],['Anticipaciones',antic,'',0]]);
+}
+
+/* ---------- 3. Visión periférica ---------- */
+const DIRS=['Derecha','Arriba-der.','Arriba','Arriba-izq.','Izquierda','Abajo-izq.','Abajo','Abajo-der.'];
+async function tPeriph(lv){
+  const dur=[250,150,100][lv-1], reps=[1,2,2][lv-1], rad=[22,16,12][lv-1], ECC=[.35,.65,.95];
+  const lines=['Mirá SIEMPRE la cruz central, sin mover los ojos.','Va a aparecer un destello breve en la periferia.','Después tocá la pantalla en la dirección donde lo viste. Si no lo viste, tocá el centro.'];
+  if(VT.useGaze) lines.push('La cámara controla que no muevas la mirada.');
+  await intro('Visión periférica',lines);
+  await countdown();
+  let trials=[]; for(let r=0;r<reps;r++) for(let d=0;d<8;d++) for(let e=0;e<3;e++) trials.push({d,e});
+  trials=shuffle(trials);
+  const cx=VT.W/2, cy=VT.H/2, rx=VT.W*0.47, ry=VT.H*0.44, out=[];
+  for(let i=0;i<trials.length;i++){
+    const tr=trials[i];
+    clr(); cross(cx,cy); hud(`${i+1} / ${trials.length}`);
+    await waitIgnoring(rand(700,1600));
+    const a=tr.d*Math.PI/4, x=cx+Math.cos(a)*rx*ECC[tr.e], y=cy-Math.sin(a)*ry*ECC[tr.e];
+    dot(x,y,rad,C.fg);
+    const tOn=await frame();
+    await vtWait(dur);
+    clr(); cross(cx,cy); hud(`${i+1} / ${trials.length}`);
+    const tOff=await frame();
+    let dev=false;
+    if(VT.useGaze){ const tol=gazeTol(); dev=VT.gaze.some(s=>s.valid && s.t>=tOn-150 && s.t<=tOff+50 && Math.hypot(s.x-cx,s.y-cy)>tol); }
+    X.strokeStyle='rgba(139,148,158,.18)'; X.lineWidth=1;
+    for(let k=0;k<8;k++){ const b=(k+0.5)*Math.PI/4; X.beginPath(); X.moveTo(cx+Math.cos(b)*60,cy-Math.sin(b)*60); X.lineTo(cx+Math.cos(b)*VT.W,cy-Math.sin(b)*VT.W); X.stroke(); }
+    ring(cx,cy,55,'rgba(139,148,158,.5)',2); txt('No lo vi',cx,cy+78,14,C.mut,'center',500);
+    txt('¿Dónde apareció? Tocá en esa dirección',cx,VT.H-34,18,C.mut,'center',600);
+    const tap=await vtWait(null,true);
+    const dx=tap.x-cx, dy=cy-tap.y; let resp=null;
+    if(Math.hypot(dx,dy)>60){ let ang=Math.atan2(dy,dx); if(ang<0) ang+=2*Math.PI; resp=Math.round(ang/(Math.PI/4))%8; }
+    const ok=resp===tr.d;
+    out.push({ ...tr, ok, resp, dev, rt:tap.t-tOff });
+    clr(); cross(cx,cy);
+    txt(dev?'Moviste la mirada: ensayo anulado':ok?'Correcto':resp===null?'No visto':'Incorrecto', cx, cy+70, 22, dev?C.warn:ok?C.go:C.bad);
+    await vtWait(450);
+  }
+  const val=out.filter(o=>!o.dev), pct=a=>a.length?100*a.filter(o=>o.ok).length/a.length:null;
+  const byDir=[0,1,2,3,4,5,6,7].map(d=>pct(val.filter(o=>o.d===d))), byEcc=[0,1,2].map(e=>pct(val.filter(o=>o.e===e)));
+  const total=pct(val);
+  const metrics=[['Detección total',total,'%',0],['Zona parafoveal (cerca del centro)',byEcc[0],'%',0],['Periferia media',byEcc[1],'%',0],['Periferia lejana',byEcc[2],'%',0],
+    ['Tiempo de respuesta',median(val.filter(o=>o.ok).map(o=>o.rt)),'ms',0]];
+  if(VT.useGaze) metrics.push(['Ensayos anulados por mirada',out.length-val.length,'',0]);
+  return mkRes('periph',lv,{label:'Detección periférica',value:total,unit:'%',dec:0,better:'high'},metrics,{byDir,byEcc});
+}
+
+/* ---------- 4. Tabla de Schulte ---------- */
+async function tSchulte(lv, o={}){
+  const n=lv===1?4:lv===2?5:6, total=n*n, reshuffle=lv===4;
+  const live=$('optLivePanel').checked;
+  const lines=[`Tocá los números del 1 al ${total} en orden ascendente, lo más rápido posible.`,'Tratá de mirar el centro de la tabla y encontrar los números con la visión periférica.'];
+  if(reshuffle) lines.push('Nivel 4: los números cambian de lugar después de cada acierto.');
+  if(o.limit) lines.push(`Tenés ${Math.round(o.limit/1000)} segundos; si no llegás, cuenta hasta dónde llegaste.`);
+  await intro(`Tabla de Schulte ${n}x${n}`,lines);
+  await countdown();
+  let nums=shuffle([...Array(total)].map((_,i)=>i+1));
+  const side = live && VT.W>VT.H*1.15, pw = side ? Math.min(360, VT.W*0.32) : 0;
+  const areaW=VT.W-pw, size=Math.min(areaW-24, VT.H-90)*0.94, cell=size/n, ox=(areaW-size)/2, oy=(VT.H-size)/2+22;
+  const st={ next:1, errors:0, flash:null, found:[], foundIdx:new Set(), layouts:[nums.slice()] };
+  const cellOf=(x,y)=>{ const c=Math.floor((x-ox)/cell), r=Math.floor((y-oy)/cell); return (c<0||r<0||c>=n||r>=n)?-1:r*n+c; };
+  const tStart=performance.now(); let last=tStart; const splits=[];
+  // mirada en vivo por casillero
+  const dwell=new Float64Array(total); let gi=0, lastG=null, fixCount=0, lastFixCalc=0;
+  while(gi<VT.gaze.length && VT.gaze[gi].t<tStart) gi++;
+  const updGaze=now=>{
+    for(;gi<VT.gaze.length;gi++){ const s=VT.gaze[gi]; if(!s.valid){ lastG=null; continue; } const k=cellOf(s.x,s.y); if(lastG && k>=0) dwell[k]+=Math.min(100,s.t-lastG.t); lastG=s; }
+    if(side && VT.useGaze && now-lastFixCalc>500){ lastFixCalc=now; fixCount=fixations(VT.gaze.filter(s=>s.valid&&s.t>=tStart).map(s=>({t:s.t,x:s.x,y:s.y,u:0,v:0,vt:0,valid:true}))).length; }
+  };
+  const drawPanel=now=>{
+    const x0=areaW+8, w=pw-24; let y=oy+6;
+    X.fillStyle='#11161d'; X.fillRect(areaW, 0, pw, VT.H);
+    txt(`TABLA DE SCHULTE ${n}x${n}`, x0, y, 17, C.fg, 'left', 800); y+=22;
+    txt(VT.useGaze?'Panel del evaluador · análisis de mirada':'Panel del evaluador', x0, y, 12, C.mut, 'left', 500); y+=30;
+    const done=st.next>total, buscando=(now-last)/1000;
+    const rows=[['TIEMPO',`${((now-tStart)/1000).toFixed(1)} s`,C.fg],['OBJETIVO',done?'—':String(st.next),C.fg],['ENCONTRADOS',`${st.next-1} / ${total}`,C.fg],['ERRORES',String(st.errors),st.errors?C.bad:C.fg]];
+    if(VT.useGaze) rows.push(['FIJACIONES',String(fixCount),C.fg]);
+    rows.push(['BUSCANDO HACE',`${buscando.toFixed(1)} s`, buscando>3?C.bad:buscando>1.5?C.warn:C.y]);
+    rows.forEach(([l,v,c])=>{ txt(l,x0,y,12,C.mut,'left',600); txt(v,x0+w*0.55,y,17,c,'left',700); y+=27; });
+    y+=8;
+    if(!VT.useGaze){ txt('Activá cámara y calibración',x0,y+10,12,C.mut,'left',500); txt('para ver el mapa de mirada',x0,y+28,12,C.mut,'left',500); return; }
+    txt('Mapa de calor (permanencia) + recorrido 2,5 s', x0, y, 11, C.mut, 'left', 500); y+=12;
+    const ms=Math.min(w, VT.H-y-14), mc=ms/n; let mx=0; for(const v of dwell) if(v>mx) mx=v;
+    const lay=nums;
+    for(let k=0;k<total;k++){
+      const c=k%n, r=Math.floor(k/n), v=mx?dwell[k]/mx:0, [R,G,B]=infernoColor(v);
+      X.fillStyle=`rgb(${R},${G},${B})`; X.fillRect(x0+c*mc+1,y+r*mc+1,mc-2,mc-2);
+      txt(String(lay[k]), x0+c*mc+mc/2, y+r*mc+mc/2, mc*0.32, v>0.6?'#111':'#fff', 'center', 700);
+      if(!reshuffle && lay[k]===st.next){ X.strokeStyle=C.y; X.lineWidth=2; X.strokeRect(x0+c*mc+2,y+r*mc+2,mc-4,mc-4); }
+    }
+    const recent=VT.gaze.filter(s=>s.valid && s.t>=now-2500);
+    if(recent.length>1){
+      const P2=s=>[x0+clamp((s.x-ox)/size,0,1)*ms, y+clamp((s.y-oy)/size,0,1)*ms];
+      X.strokeStyle='rgba(255,211,61,.9)'; X.lineWidth=2; X.beginPath(); recent.forEach((s,i)=>{ const [a,b]=P2(s); i?X.lineTo(a,b):X.moveTo(a,b); }); X.stroke();
+      const [a,b]=P2(recent.at(-1)); ring(a,b,7,C.y,2);
+    }
+  };
+  const draw=now=>{
+    clr();
+    if(!side) txt(st.next<=total?`Buscá el ${st.next}`:'¡Terminado!', areaW/2, oy-26, 18, C.mut);
+    if(o.limit) hud(`${Math.max(0,Math.ceil((o.limit-(now-tStart))/1000))} s`);
+    for(let k=0;k<total;k++){
+      const c=k%n, r=Math.floor(k/n), x=ox+c*cell, y=oy+r*cell;
+      const fl=st.flash && st.flash.idx===k && now<st.flash.until, found=!reshuffle && st.foundIdx.has(k);
+      X.fillStyle = fl ? st.flash.color : found ? '#1f5f3a' : '#161b22'; X.fillRect(x+3,y+3,cell-6,cell-6);
+      txt(String(nums[k]), x+cell/2, y+cell/2, cell*0.38, found?'#a8e6c1':C.fg, 'center', 700);
+    }
+    if(side) drawPanel(now);
+  };
+  let running=true;
+  (async()=>{ while(running){ const now=await frame(); updGaze(now); draw(now); } })().catch(()=>{});
+  while(st.next<=total){
+    const rem = o.limit ? o.limit-(performance.now()-tStart) : null;
+    if(rem!=null && rem<=0) break;
+    const tap=await vtWait(rem,true); if(!tap) break;
+    const idx=cellOf(tap.x,tap.y); if(idx<0) continue;
+    if(nums[idx]===st.next){
+      splits.push(tap.t-last); last=tap.t; st.found.push([st.next, Math.round(tap.t-VT.t0), idx]); st.foundIdx.add(idx); st.next++;
+      if(reshuffle && st.next<=total){ nums=shuffle(nums); st.layouts.push(nums.slice()); }
+      else st.flash={idx,color:'#2ea043',until:performance.now()+150};
+    } else { st.errors++; st.flash={idx,color:'#8b2b2b',until:performance.now()+250}; }
+  }
+  await vtWait(500); running=false; await frame();
+  const complete=st.next>total, T=complete?(last-tStart)/1000:(o.limit/1000), mxS=splits.length?Math.max(...splits):null, slowI=splits.indexOf(mxS);
+  const metrics=[['Tiempo total',T,'s',1],['Encontrados',`${st.next-1} / ${total}`,'',0],['Errores',st.errors,'',0],['Tiempo medio por número',splits.length?mean(splits)/1000:null,'s',2],
+    ['Número más lento',mxS!=null?mxS/1000:null,'s',2],['Cuál fue el más lento',slowI>=0?`N° ${slowI+1}`:'—','',0]];
+  const sd={ n, reshuffle, layouts: reshuffle ? st.layouts : [st.layouts[0]], geo:{ox:Math.round(ox),oy:Math.round(oy),size:Math.round(size)}, t0:Math.round(tStart-VT.t0), found:st.found };
+  if(VT.useGaze){
+    const A=schulteAnalysis(sd, VT.gaze.filter(s=>s.valid && s.t>=tStart && s.t<=last+200).map(s=>({t:s.t-VT.t0,x:s.x,y:s.y})));
+    Object.assign(sd, { dwell:A.dwell, perNum:A.perNum });
+    metrics.push(['Fijaciones por número',A.fixPerNum,'',1],['Vistos sin reconocer',A.seen,'',0],['Re-visitas a números ya encontrados',A.revis,'',0],
+      ['Estrategia de búsqueda',A.strategy,'',0],['Saltos a casilleros vecinos',A.adjPct,'%',0],['Mirada dentro de la tabla',A.inGrid,'%',0]);
+  }
+  return mkRes('schulte',lv,{label:'Tiempo total',value:T,unit:'s',dec:1,better:'low'},metrics,{schulte:sd});
+}
+
+/* análisis de la búsqueda visual en la Tabla de Schulte (tiempos relativos a VT.t0) */
+function schulteAnalysis(sd, samples){
+  const {n, geo, found, layouts, reshuffle}=sd, total=n*n, cell=geo.size/n;
+  const cellOf=(x,y)=>{ const c=Math.floor((x-geo.ox)/cell), r=Math.floor((y-geo.oy)/cell); return (c<0||r<0||c>=n||r>=n)?-1:r*n+c; };
+  const dwell=Array(total).fill(0); let inG=0;
+  for(let i=0;i<samples.length;i++){ const k=cellOf(samples[i].x,samples[i].y); if(k>=0){ inG++; if(i) dwell[k]+=Math.min(100,samples[i].t-samples[i-1].t); } }
+  const fx=fixations(samples.map(s=>({t:s.t,x:s.x,y:s.y,u:0,v:0,vt:s.t/1000,valid:true}))).map(f=>({ s:f.vt*1000, e:f.vt*1000+f.dur, k:cellOf(f.x,f.y) }));
+  const perNum=[]; let seenN=0, revisN=0;
+  for(let m=1;m<=found.length;m++){
+    const tm=found[m-1][1], prev=m===1?sd.t0:found[m-2][1], lay=layouts[reshuffle?m-1:0], tgt=found[m-1][2];
+    const win=fx.filter(f=>f.s>=prev && f.s<tm);
+    let seen=false;
+    win.forEach((f,i)=>{ if(f.k===tgt && f.e<tm-300 && win.slice(i+1).some(g=>g.k!==tgt)) seen=true; });
+    const revis=reshuffle?0:win.filter(f=>f.k>=0 && lay[f.k]<m).length;
+    if(seen) seenN++; revisN+=revis;
+    perNum.push([m, Math.round(tm-prev), win.length, seen?1:0, revis]);
+  }
+  let adj=0, pairs=0;
+  const g=fx.filter(f=>f.k>=0);
+  for(let i=1;i<g.length;i++){ if(g[i].k===g[i-1].k) continue; pairs++; const a=g[i].k, b=g[i-1].k; if(Math.max(Math.abs(a%n-b%n),Math.abs(Math.floor(a/n)-Math.floor(b/n)))===1) adj++; }
+  const adjPct=pairs?100*adj/pairs:null;
+  const strategy = adjPct==null ? '—' : adjPct>=60 ? 'Sistemática (barrido)' : adjPct>=40 ? 'Mixta' : 'Dispersa (saltos largos)';
+  return { dwell:dwell.map(Math.round), perNum, seen:seenN, revis:revisN, adjPct, strategy,
+    fixPerNum: perNum.length ? mean(perNum.map(p=>p[2])) : null, inGrid: samples.length?100*inG/samples.length:null };
+}
+function infernoColor(v){
+  const st=[[0,[20,11,52]],[.25,[87,16,110]],[.5,[188,55,84]],[.75,[249,142,9]],[1,[252,255,164]]];
+  for(let i=1;i<st.length;i++) if(v<=st[i][0]){ const [a,ca]=st[i-1], [b,cb]=st[i], t=(v-a)/(b-a); return ca.map((c,j)=>Math.round(c+(cb[j]-c)*t)); }
+  return st.at(-1)[1];
+}
+/* vista "por casillero" en el visor (acumulada hasta el instante t) */
+function drawSchulteCells(X2, W, H, r, t, pts, s){
+  const sd=r.detail.schulte, g=r.gazeRec, sx=W/g.W, sy=H/g.H, n=sd.n, total=n*n, cell=sd.geo.size/n;
+  X2.fillStyle='#0b0f14'; X2.fillRect(0,0,W,H);
+  const cellOf=(x,y)=>{ const c=Math.floor((x-sd.geo.ox)/cell), q=Math.floor((y-sd.geo.oy)/cell); return (c<0||q<0||c>=n||q>=n)?-1:q*n+c; };
+  const dw=Array(total).fill(0); let prev=null;
+  for(const p of pts){ if(p.t>t) break; const k=cellOf(p.x,p.y); if(prev && k>=0) dw[k]+=Math.min(100,p.t-prev.t); prev=p; }
+  const mx=Math.max(...dw,1e-9), nFound=sd.found.filter(f=>f[1]<=t).length, lay=sd.layouts[sd.reshuffle?Math.min(nFound,sd.layouts.length-1):0];
+  const foundIdx=new Set(sd.reshuffle?[]:sd.found.filter(f=>f[1]<=t).map(f=>f[2]));
+  for(let k=0;k<total;k++){
+    const c=k%n, q=Math.floor(k/n), x=(sd.geo.ox+c*cell)*sx, y=(sd.geo.oy+q*cell)*sy, w=cell*sx, h=cell*sy, v=dw[k]/mx, [R,G,B]=infernoColor(v);
+    X2.fillStyle=`rgb(${R},${G},${B})`; X2.fillRect(x+1.5*s,y+1.5*s,w-3*s,h-3*s);
+    if(foundIdx.has(k)){ X2.strokeStyle='#2ea043'; X2.lineWidth=3*s; X2.strokeRect(x+3*s,y+3*s,w-6*s,h-6*s); }
+    if(nFound<sd.found.length && lay[k]===nFound+1){ X2.strokeStyle='#ffd33d'; X2.lineWidth=3*s; X2.strokeRect(x+3*s,y+3*s,w-6*s,h-6*s); }
+    X2.fillStyle=v>0.6?'#111':'#fff'; X2.font=`700 ${Math.min(w,h)*0.32}px ${FONT}`; X2.textAlign='center'; X2.textBaseline='middle'; X2.fillText(String(lay[k]),x+w/2,y+h/2);
+  }
+  const rec=pts.filter(p=>p.t<=t && p.t>=t-2500);
+  if(rec.length>1){ X2.strokeStyle='rgba(255,211,61,.9)'; X2.lineWidth=2.5*s; X2.beginPath(); rec.forEach((p,i)=>{ i?X2.lineTo(p.x*sx,p.y*sy):X2.moveTo(p.x*sx,p.y*sy); }); X2.stroke();
+    const l=rec.at(-1); X2.beginPath(); X2.arc(l.x*sx,l.y*sy,9*s,0,7); X2.stroke(); }
+  // panel
+  const t0=sd.t0, el=Math.max(0,t-t0)/1000, lastFound=nFound?sd.found[nFound-1][1]:t0, nFix=g.fix.filter(f=>f.t>=t0 && f.t<=t).length;
+  const rows=[['Tiempo',`${el.toFixed(1)} s`],['Objetivo',nFound<sd.found.length?String(nFound+1):'—'],['Encontrados',`${nFound} / ${total}`],['Fijaciones',String(nFix)],['Buscando hace',`${(Math.max(0,t-lastFound)/1000).toFixed(1)} s`]];
+  const bw=170*s, bh=(rows.length*20+14)*s; X2.fillStyle='rgba(13,17,23,.85)'; X2.fillRect(8*s,8*s,bw,bh);
+  X2.textAlign='left'; X2.textBaseline='middle';
+  rows.forEach(([l,v],i)=>{ const y=(22+i*20)*s; X2.fillStyle='#8b949e'; X2.font=`600 ${11*s}px ${FONT}`; X2.fillText(l.toUpperCase(),16*s,y); X2.fillStyle=i===4?'#ffd33d':'#e6edf3'; X2.font=`700 ${13*s}px ${FONT}`; X2.fillText(v,110*s,y); });
+}
+function schulteCellImg(r){
+  const g=r.gazeRec, W=720, H=Math.round(720*g.H/g.W), c=document.createElement('canvas'); c.width=W; c.height=H;
+  const pts=g.s.map(a=>({t:a[0],x:a[1],y:a[2]}));
+  drawSchulteCells(c.getContext('2d'), W, H, r, 1e12, pts.map(p=>({...p})), W/g.W*1.6);
+  // sin recorrido de 2,5 s ni panel de tiempo para la imagen final: se redibuja limpia
+  const x=c.getContext('2d'), sd=r.detail.schulte, n=sd.n, sx=W/g.W, sy=H/g.H, cell=sd.geo.size/n, total=n*n, mx=Math.max(...sd.dwell,1e-9);
+  x.fillStyle='#0b0f14'; x.fillRect(0,0,W,H);
+  const lay=sd.layouts[0];
+  for(let k=0;k<total;k++){ const cc=k%n, q=Math.floor(k/n), X0=(sd.geo.ox+cc*cell)*sx, Y0=(sd.geo.oy+q*cell)*sy, w=cell*sx, h=cell*sy, v=sd.dwell[k]/mx, [R,G,B]=infernoColor(v);
+    x.fillStyle=`rgb(${R},${G},${B})`; x.fillRect(X0+2,Y0+2,w-4,h-4); x.fillStyle=v>0.6?'#111':'#fff'; x.font=`700 ${Math.min(w,h)*0.32}px Helvetica,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(sd.reshuffle?'':String(lay[k]),X0+w/2,Y0+h/2); }
+  return c.toDataURL('image/jpeg',.9);
+}
+
+/* ---------- 5. Seguimiento múltiple de objetos (MOT) ---------- */
+async function tMOT(lv, o={}){
+  const cfg=o.cfg||[{n:6,k:2,sp:.18},{n:8,k:3,sp:.24},{n:10,k:4,sp:.30}][lv-1], rounds=o.rounds||6, trackMs=o.trackMs||6000;
+  await intro('Seguimiento múltiple (MOT)',[`Se van a marcar ${cfg.k} pelotas en amarillo: memorizalas.`,'Después todas se ven iguales y se mueven: seguilas con la vista.','Cuando se detengan, tocá las que estaban marcadas.',o.speeds?`${rounds} rondas, cada una más rápida.`:'La velocidad se adapta a tu rendimiento.']);
+  const m=Math.min(VT.W,VT.H), R=m*0.032, TOP=48; let speed=cfg.sp; const scores=[];
+  for(let round=0; round<rounds; round++){
+    if(o.speeds) speed=o.speeds[round];
+    const balls=[]; let guard=0;
+    while(balls.length<cfg.n && guard++<5000){
+      const b={ x:rand(R*2,VT.W-R*2), y:rand(TOP+R*2,VT.H-R*2) };
+      if(balls.every(o=>Math.hypot(o.x-b.x,o.y-b.y)>R*3)){ const a=Math.random()*2*Math.PI; b.vx=Math.cos(a); b.vy=Math.sin(a); balls.push(b); }
+    }
+    const tg=shuffle([...balls.keys()]).slice(0,cfg.k);
+    const drawB=col=>{ clr(); hud(`Ronda ${round+1} / ${rounds}`); balls.forEach((b,i)=>dot(b.x,b.y,R,col?col(i):C.ball)); };
+    drawB(i=>tg.includes(i)?C.y:C.ball); await vtWait(2000);
+    let tPrev=await frame(); const tEnd=tPrev+trackMs;
+    while(true){
+      const t=await frame(); const dt=Math.min(0.05,(t-tPrev)/1000); tPrev=t; if(t>=tEnd) break;
+      const v=speed*m;
+      for(const b of balls){
+        const a=Math.atan2(b.vy,b.vx)+(Math.random()-.5)*0.25; b.vx=Math.cos(a); b.vy=Math.sin(a);
+        b.x+=b.vx*v*dt; b.y+=b.vy*v*dt;
+        if(b.x<R){ b.x=R; b.vx=Math.abs(b.vx); } if(b.x>VT.W-R){ b.x=VT.W-R; b.vx=-Math.abs(b.vx); }
+        if(b.y<TOP+R){ b.y=TOP+R; b.vy=Math.abs(b.vy); } if(b.y>VT.H-R){ b.y=VT.H-R; b.vy=-Math.abs(b.vy); }
+      }
+      for(let i=0;i<balls.length;i++) for(let j=i+1;j<balls.length;j++){
+        const p=balls[i], q=balls[j], d=Math.hypot(p.x-q.x,p.y-q.y);
+        if(d<2*R && d>0){ [p.vx,q.vx]=[q.vx,p.vx]; [p.vy,q.vy]=[q.vy,p.vy]; const o=(2*R-d)/2, ux=(p.x-q.x)/d, uy=(p.y-q.y)/d; p.x+=ux*o; p.y+=uy*o; q.x-=ux*o; q.y-=uy*o; }
+      }
+      drawB();
+    }
+    const sel=[];
+    const drawSel=()=>{ drawB(i=>sel.includes(i)?'#ffffff':C.ball); txt(`Tocá las ${cfg.k} pelotas marcadas (${sel.length}/${cfg.k})`,VT.W/2,VT.H-26,18,C.mut); };
+    drawSel();
+    while(sel.length<cfg.k){
+      const tap=await vtWait(null,true); let bi=-1, bd=1e9;
+      balls.forEach((b,i)=>{ const d=Math.hypot(b.x-tap.x,b.y-tap.y); if(d<bd){ bd=d; bi=i; } });
+      if(bd<R*1.8 && !sel.includes(bi)){ sel.push(bi); drawSel(); }
+    }
+    const hits=sel.filter(i=>tg.includes(i)).length; scores.push(hits/cfg.k);
+    drawB(i=>tg.includes(i)?(sel.includes(i)?C.go:C.y):(sel.includes(i)?C.bad:'#30363d'));
+    txt(`${hits} / ${cfg.k} correctas`,VT.W/2,VT.H-26,20,hits===cfg.k?C.go:C.warn,'center',700);
+    await vtWait(1400);
+    speed = hits===cfg.k ? speed*1.12 : Math.max(cfg.sp*0.6, speed*0.92);
+  }
+  const acc=100*mean(scores);
+  return mkRes('mot',lv,{label:'Precisión',value:acc,unit:'%',dec:0,better:'high'},[
+    ['Precisión',acc,'%',0],['Rondas perfectas',`${scores.filter(s=>s===1).length} / ${rounds}`,'',0],
+    ['Velocidad alcanzada',speed/cfg.sp,'x',2],['Pelotas / objetivos',`${cfg.n} / ${cfg.k}`,'',0]],{scores});
+}
+
+/* ---------- 6. Coordinación ojo-mano ---------- */
+async function tEyeHand(lv){
+  const durMs=[30000,30000,45000][lv-1], R=[46,34,24][lv-1];
+  await intro('Coordinación ojo-mano',['Tocá cada círculo apenas aparezca, lo más rápido y preciso posible.',`Duración: ${durMs/1000} segundos.`]);
+  await countdown();
+  const tEnd=performance.now()+durMs; let hits=0, misses=0; const times=[], lats=[];
+  while(performance.now()<tEnd){
+    const x=rand(R+20,VT.W-R-20), y=rand(R+56,VT.H-R-20);
+    clr(); dot(x,y,R,C.acc); dot(x,y,R*0.35,'#fff');
+    hud(`${Math.ceil((tEnd-performance.now())/1000)} s · ${hits} aciertos`);
+    const t0=await frame();
+    while(true){
+      const left=tEnd-performance.now(); if(left<=0) break;
+      const tap=await vtWait(left,true); if(!tap) break;
+      if(Math.hypot(tap.x-x,tap.y-y)<=R*1.2){
+        hits++; times.push(tap.t-t0);
+        if(VT.useGaze){ const tol=gazeTol(), g=VT.gaze.find(s=>s.valid && s.t>=t0 && Math.hypot(s.x-x,s.y-y)<tol); if(g) lats.push(g.t-t0); }
+        break;
+      } else misses++;
+    }
+  }
+  const metrics=[['Aciertos',hits,'',0],['Errores',misses,'',0],['Tiempo medio por objetivo',mean(times),'ms',0],['Aciertos por minuto',hits/(durMs/60000),'',1]];
+  if(VT.useGaze) metrics.push(['Latencia de la mirada',median(lats),'ms',0]);
+  return mkRes('eyehand',lv,{label:'Aciertos',value:hits,unit:'',dec:0,better:'high'},metrics);
+}
+
+/* ---------- 7. Seguimiento suave (requiere mirada) ---------- */
+async function tPursuit(lv){
+  const k=[1,1.5,2][lv-1], durMs=20000;
+  await intro('Seguimiento suave',['Seguí el punto amarillo con la mirada todo el tiempo, sin mover la cabeza.','Duración: 20 segundos.']);
+  await countdown();
+  const cx=VT.W/2, cy=VT.H/2, Ax=VT.W*0.4, Ay=VT.H*0.36, errs=[]; let frames=0, nog=0;
+  const t0=await frame();
+  while(true){
+    const t=await frame(), el=(t-t0)/1000; if(el*1000>=durMs) break;
+    const x=cx+Ax*Math.sin(2*Math.PI*0.13*k*el), y=cy+Ay*Math.sin(2*Math.PI*0.19*k*el+Math.PI/2);
+    clr(); dot(x,y,14,C.y); dot(x,y,4,'#000'); hud(`${Math.ceil(durMs/1000-el)} s`);
+    if(el>1){ frames++; const g=VT.lastGaze; if(g && t-g.t<120) errs.push(Math.hypot(g.x-x,g.y-y)); else nog++; }
+  }
+  const tol=gazeTol(), on=frames?100*errs.filter(e=>e<tol).length/frames:null;
+  return mkRes('pursuit',lv,{label:'Tiempo sobre el objetivo',value:on,unit:'%',dec:0,better:'high'},[
+    ['Tiempo sobre el objetivo',on,'%',0],['Error medio',mean(errs),'px',0],['Error mediano',median(errs),'px',0],['Sin mirada detectada',frames?100*nog/frames:null,'%',0]]);
+}
+
+
+/* ---------- 8. Ojo dominante (Miles / Porta) ---------- */
+async function askButtons(title, sub, options, draw){
+  const cx=VT.W/2; clr(); if(draw) draw();
+  txt(title, cx, 54, 28, C.fg, 'center', 700);
+  let y=96; wrap(sub, Math.min(VT.W*0.86,700), 19).forEach(l=>{ txt(l,cx,y,19,C.mut,'center',500); y+=28; });
+  const n=options.length, bw=Math.min(240,(VT.W-40)/n-12), bh=64, gap=14, tot=n*bw+(n-1)*gap, by=VT.H-bh-30;
+  const boxes=options.map((o,i)=>({ x:cx-tot/2+i*(bw+gap), y:by, w:bw, h:bh, o }));
+  boxes.forEach((b,i)=>{ X.fillStyle = n===2 ? (i===0?C.go:C.bad) : C.acc; X.beginPath(); X.roundRect ? X.roundRect(b.x,b.y,b.w,b.h,12) : X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(b.o,b.x+b.w/2,b.y+b.h/2,20,'#fff','center',700); });
+  while(true){
+    const t=await vtWait(null,true);
+    const i=boxes.findIndex(b=>t.x>=b.x && t.x<=b.x+b.w && t.y>=b.y-8 && t.y<=b.y+b.h+8);
+    if(i>=0) return i;
+  }
+}
+function faceRatio(t0,t1){
+  const a=VT.face.filter(s=>s.t>=t0 && s.t<=t1 && s.oR>0.01).map(s=>s.oL/s.oR);
+  return a.length>=5 ? median(a) : null;
+}
+async function tEyeDom(){
+  const cx=VT.W/2, cy=VT.H/2+20;
+  const target=()=>{ dot(cx,cy,74,C.bad); dot(cx,cy,52,'#fff'); dot(cx,cy,30,C.bad); dot(cx,cy,9,'#fff'); };
+  await intro('Ojo dominante',[
+    'Métodos clásicos de Miles (triángulo con las manos) y Porta (señalar con el dedo).',
+    'El jugador se ubica de frente al iPad, a 1–3 m. El evaluador maneja la pantalla y marca las respuestas que da el jugador.',
+    'Si la cámara está activa, verifica qué ojo cerró el jugador (funciona mejor a menos de 1,5 m).']);
+  const method = (await askButtons('Método','Elegí cómo se va a evaluar',['Miles (triángulo)','Porta (dedo)'].map(s=>s)))===0 ? 'Miles' : 'Porta';
+  const hand = ['Derecha','Izquierda',null][await askButtons('Mano hábil del jugador','Sirve para detectar dominancia cruzada ojo-mano',['Derecha','Izquierda','Sin dato'])];
+  const frameTxt = method==='Miles'
+    ? 'Con los DOS ojos abiertos, juntá las manos formando un pequeño triángulo, brazos extendidos, y encuadrá el centro del objetivo.'
+    : 'Con los DOS ojos abiertos, extendé el brazo y tapá con la punta del dedo índice el centro del objetivo.';
+  const keepTxt = method==='Miles' ? '¿El centro del objetivo sigue dentro del triángulo?' : '¿El dedo sigue tapando el centro del objetivo?';
+  const still = method==='Miles' ? 'las manos' : 'el brazo';
+  const camOn=!!S.lm; VT.face=[]; if(camOn) S.mode='eyedom';
+  const N=3, votes=[]; let verified=0, checks=0;
+  for(let i=0;i<N;i++){
+    const order = Math.random()<.5 ? ['L','R'] : ['R','L'];
+    const tA=performance.now();
+    await askButtons(`Repetición ${i+1} de ${N}`, frameTxt, ['Encuadrado'], target);
+    const base=faceRatio(tA, performance.now());
+    const ans={};
+    for(const eye of order){
+      const t1=performance.now();
+      const k=await askButtons(`Cerrá el ojo ${eye==='L'?'IZQUIERDO':'DERECHO'}`, `Sin mover ${still}: ${keepTxt}`, ['Sí','No'], target);
+      ans[eye]=k===0;
+      if(camOn){ checks++; const r=faceRatio(t1, performance.now()); if(r!=null && base!=null && (eye==='L' ? r<base*0.6 : r>base/0.6)) verified++; }
+      if(eye===order[0]) await askButtons('Abrí los dos ojos', 'Volvé a encuadrar el objetivo con los dos ojos abiertos.', ['Listo'], target);
+    }
+    votes.push(ans.L && !ans.R ? 'Derecho' : ans.R && !ans.L ? 'Izquierdo' : 'Indefinido');
+  }
+  S.mode='idle';
+  const cR=votes.filter(v=>v==='Derecho').length, cL=votes.filter(v=>v==='Izquierdo').length;
+  const dom = cR>=2 ? 'Derecho' : cL>=2 ? 'Izquierdo' : 'No definido', cons=Math.max(cR,cL);
+  const strength = cons===3 ? 'Fuerte' : cons===2 ? 'Moderada' : 'No definida';
+  const cross = hand && dom!=='No definido' ? ((hand==='Derecha')!==(dom==='Derecho') ? 'Sí' : 'No') : '—';
+  const metrics=[['Ojo dominante',dom,'',0],['Consistencia',`${cons} / ${N} repeticiones`,'',0],['Grado de dominancia',strength,'',0],
+    ['Método',method,'',0],['Mano hábil',hand||'Sin dato','',0],['Dominancia cruzada ojo-mano',cross,'',0]];
+  if(camOn) metrics.push(['Cierres de ojo verificados por cámara',`${verified} / ${checks}`,'',0]);
+  return mkRes('eyedom',1,{label:'Ojo dominante',value:dom,unit:'',dec:0,better:null},metrics,{votes,method,hand});
+}
+
+/* ---------- 9. Memoria visual: "¿cuál es la nueva?" ---------- */
+let AC=null;
+function beep(f=880,ms=120){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const o=AC.createOscillator(), g=AC.createGain(); o.frequency.value=f; o.connect(g); g.connect(AC.destination); g.gain.setValueAtTime(.18,AC.currentTime); g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+ms/1000); o.start(); o.stop(AC.currentTime+ms/1000); }catch(e){} }
+const LCOL=['#a371f7','#3fb950','#58a6ff','#f0883e','#ffd33d','#f85149','#db61a2','#39d0d8'];
+async function tMemVis(lv, o={}){
+  const nL=o.lights||[15,20,25][lv-1], limit=o.limit||60000, nPos=nL+6;
+  await intro('Memoria visual',['Se enciende una luz (con su sonido): tocala.','Después se encienden las que ya viste más una nueva. Tocá SOLO la nueva.',`Son ${nL} luces en ${Math.round(limit/1000)} segundos.`]);
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); AC.resume&&AC.resume(); }catch(e){}
+  await countdown();
+  const cx=VT.W/2, cy=VT.H/2+16, rx=Math.min(VT.W*0.42, 460), ry=Math.min(VT.H*0.36, 300), sz=Math.max(28,Math.min(52, Math.min(rx,ry)*0.17));
+  const pos=[]; let guard=0;
+  while(pos.length<nPos && guard++<20000){ const a=Math.random()*2*Math.PI, r=Math.sqrt(Math.random()); const p={x:cx+Math.cos(a)*r*(rx-sz), y:cy+Math.sin(a)*r*(ry-sz)}; if(pos.every(q=>Math.hypot(q.x-p.x,q.y-p.y)>sz*1.55)) pos.push(p); }
+  const order=shuffle([...pos.keys()]).slice(0,nL), t0=performance.now();
+  let correct=0, wrong=0, round=0; const rts=[];
+  const draw=(lit,flash)=>{
+    clr(); hud(`${Math.max(0,Math.ceil((limit-(performance.now()-t0))/1000))} s`);
+    txt('¿Cuál es la nueva?', cx, 46, 24, C.fg, 'center', 700);
+    X.fillStyle='#121821'; X.beginPath(); X.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); X.fill();
+    pos.forEach((p,i)=>{ const L=lit.get(i); X.fillStyle= flash&&flash.i===i ? flash.c : L || '#2a313c'; if(L){ X.shadowColor=L; X.shadowBlur=18; } X.fillRect(p.x-sz/2,p.y-sz/2,sz,sz); X.shadowBlur=0; X.strokeStyle='#3a424d'; X.lineWidth=2; X.strokeRect(p.x-sz/2,p.y-sz/2,sz,sz); });
+  };
+  for(round=0; round<nL; round++){
+    if(performance.now()-t0>=limit) break;
+    const lit=new Map(); order.slice(0,round+1).forEach(i=>lit.set(i, LCOL[Math.floor(Math.random()*LCOL.length)]));
+    const nw=order[round];
+    draw(lit); beep(660+round*25); const ts=performance.now();
+    let tap=null;
+    while(true){
+      const rem=limit-(performance.now()-t0); if(rem<=0){ tap=null; break; }
+      tap=await vtWait(Math.min(rem,1000),true);
+      if(!tap){ draw(lit); continue; }
+      const hit=pos.findIndex(p=>Math.abs(tap.x-p.x)<=sz*0.75 && Math.abs(tap.y-p.y)<=sz*0.75);
+      if(hit>=0 && lit.has(hit)){ tap.i=hit; break; }
+    }
+    if(!tap) break;
+    if(tap.i===nw){ correct++; rts.push(tap.t-ts); draw(lit,{i:nw,c:'#2ea043'}); }
+    else { wrong++; draw(lit,{i:tap.i,c:'#8b2b2b'}); X.strokeStyle='#fff'; X.lineWidth=4; X.strokeRect(pos[nw].x-sz/2-4,pos[nw].y-sz/2-4,sz+8,sz+8); }
+    await vtWait(tap.i===nw?250:700);
+  }
+  clr(); txt('¡Terminado!',VT.W/2,VT.H/2,36,C.go,'center',700); await vtWait(600);
+  const pct=100*correct/nL;
+  return mkRes('memvis',lv,{label:'Aciertos',value:pct,unit:'%',dec:0,better:'high'},[
+    ['Aciertos',pct,'%',0],['Luces correctas',`${correct} / ${nL}`,'',0],['Errores',wrong,'',0],['Alcanzó a ver',`${Math.min(round,nL)} / ${nL}`,'',0],['Tiempo de respuesta',median(rts),'ms',0]],
+    {correct, total:nL, wrong});
+}
+
+/* ---------- 10. Velocidad mental: pares de números ---------- */
+async function tVelMental(lv, o={}){
+  const nP=o.pairs||[8,10,12][lv-1], limit=o.limit||60000, cols=6, rows=Math.ceil((nP*2+12)/cols), cells=cols*rows;
+  await intro('Velocidad mental',['En la grilla hay números repetidos de a dos.',`Encontrá los ${nP} pares tocando los dos números iguales.`,`Tenés ${Math.round(limit/1000)} segundos. Los colores no importan: solo el número.`]);
+  await countdown();
+  const pool=shuffle([...Array(90)].map((_,i)=>i+10)), pairsN=pool.slice(0,nP), singles=pool.slice(nP, nP+(cells-nP*2));
+  const vals=shuffle([...pairsN,...pairsN,...singles]), cols8=['#f0883e','#da3633','#1f6feb','#a371f7','#2ea043','#d29922','#e3b341','#bf4b8a'];
+  const colr=vals.map(()=>cols8[Math.floor(Math.random()*cols8.length)]);
+  const gone=new Set(); let sel=-1, found=0, wrong=0, flash=null;
+  const top=96, size=Math.min(VT.W*0.92/cols, (VT.H-top-24)/rows), gw=size*cols, ox=(VT.W-gw)/2, oy=top;
+  const t0=performance.now(); let tEnd=null;
+  const draw=()=>{
+    clr(); hud(`${Math.max(0,Math.ceil((limit-(performance.now()-t0))/1000))} s`);
+    txt('Pares encontrados', VT.W/2, 34, 18, C.mut, 'center', 600); txt(`${found} / ${nP}`, VT.W/2, 66, 30, C.y, 'center', 800);
+    for(let k=0;k<cells;k++){ const c=k%cols, r=Math.floor(k/cols), x=ox+c*size, y=oy+r*size;
+      X.fillStyle = gone.has(k) ? '#1b2129' : flash&&flash.ks.includes(k) ? flash.c : colr[k]; X.fillRect(x+3,y+3,size-6,size-6);
+      if(k===sel){ X.strokeStyle='#fff'; X.lineWidth=4; X.strokeRect(x+4,y+4,size-8,size-8); }
+      txt(String(vals[k]), x+size/2, y+size/2, size*0.36, gone.has(k)?'#3a424d':'#fff', 'center', 800); }
+  };
+  while(found<nP){
+    const rem=limit-(performance.now()-t0); if(rem<=0) break;
+    draw(); const tap=await vtWait(Math.min(rem,1000),true); if(!tap) continue;
+    const c=Math.floor((tap.x-ox)/size), r=Math.floor((tap.y-oy)/size); if(c<0||r<0||c>=cols||r>=rows) continue;
+    const k=r*cols+c; if(gone.has(k)) continue;
+    if(sel<0){ sel=k; continue; } if(sel===k){ sel=-1; continue; }
+    if(vals[sel]===vals[k]){ gone.add(sel); gone.add(k); found++; sel=-1; if(found===nP) tEnd=tap.t; }
+    else { wrong++; flash={ks:[sel,k],c:'#8b2b2b'}; sel=-1; draw(); await vtWait(300); flash=null; }
+  }
+  draw(); await vtWait(500);
+  const T=((tEnd||performance.now())-t0)/1000;
+  return mkRes('velmental',lv,{label:'Pares encontrados',value:found,unit:'',dec:0,better:'high'},[
+    ['Pares encontrados',`${found} / ${nP}`,'',0],['Tiempo',found===nP?T:null,'s',1],['Errores',wrong,'',0],['Pares por minuto',found/(Math.min(T,limit/1000)/60),'',1]],
+    {found, total:nP, T, complete:found===nP, limit});
+}
+
+/* ---------- Evaluación rápida e Índice TrakEye ---------- */
+const DOMS=[
+  { k:'escaneo', name:'Escaneo visual', txt:['La búsqueda visual es lenta: entrenala con Schulte.','Buena búsqueda; se demora con muchos estímulos.','Encontrás lo que buscás sin perder tiempo.'] },
+  { k:'atencion', name:'Atención múltiple', txt:['Se pierden objetivos con el movimiento: entrená MOT.','Seguís varias cosas; con velocidad se pierde alguna.','Seguís varias cosas a la vez sin perder ninguna.'] },
+  { k:'memoria', name:'Memoria visual', txt:['La memoria visual se satura rápido.','Buena memoria visual; se nubla cuando hay muchas.','Gran memoria visual: retenés mucha información.'] },
+  { k:'velocidad', name:'Velocidad mental', txt:['Velocidad de procesamiento para mejorar.','Buena velocidad, con margen cuando aprieta el reloj.','Procesás muy rápido bajo presión de tiempo.'] },
+];
+const band = v => v>=80?2:v>=55?1:0;
+function indexPhrase(v){ return v>=85?'Rendimiento de élite':v>=70?'Muy bueno, con cosas para pulir':v>=55?'Bueno, con margen de mejora':v>=40?'En desarrollo':'Mucho para ganar entrenando'; }
+function scoreOf(key, r){
+  if(key==='escaneo'){ const sd=r.detail.schulte, f=sd.found.length, tot=sd.n*sd.n; if(f===tot){ const T=r.main.value; return clamp(Math.round(100-(T-18)*2),5,100); } return Math.round(20*f/tot); }
+  if(key==='atencion'){ const sc=r.detail.scores, w=[1,1.25,1.5]; let a=0,b=0; sc.forEach((s,i)=>{ a+=s*(w[i]||1.5); b+=(w[i]||1.5); }); return Math.round(100*a/b); }
+  if(key==='memoria'){ return Math.round(100*r.detail.correct/r.detail.total); }
+  if(key==='velocidad'){ const d=r.detail; return clamp(Math.round(d.found*(70/d.total) + (d.complete?30*clamp((d.limit/1000-d.T)/(d.limit/1000-10),0,1):0)),0,100); }
+}
+function rankInfo(key, r){
+  const latest=new Map(); S.tests.filter(t=>t.key===key && t.level===r.level && !!t.quick===!!r.quick && typeof t.main.value==='number').forEach(t=>latest.set(t.athlete,t));
+  const arr=[...latest.values()].sort((a,b)=>r.main.better==='low'?a.main.value-b.main.value:b.main.value-a.main.value);
+  return { pos:arr.findIndex(t=>t.athlete===r.athlete)+1, n:arr.length, arr };
+}
+async function runQuickEval(){
+  VT.useGaze=false; VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
+  $('vt').classList.add('on'); vtSetup(); VT.t0=performance.now();
+  const steps=[
+    { d:'escaneo', key:'schulte', lv:2, o:{limit:60000} },
+    { d:'atencion', key:'mot', lv:2, o:{cfg:{n:8,k:4,sp:.2}, rounds:3, speeds:[.2,.27,.34], trackMs:5000} },
+    { d:'memoria', key:'memvis', lv:2, o:{lights:20, limit:60000} },
+    { d:'velocidad', key:'velmental', lv:2, o:{pairs:10, limit:45000} } ];
+  try {
+    await intro('Evaluación rápida',['4 desafíos cortos, unos 5 minutos en total:','Escaneo visual · Atención múltiple · Memoria visual · Velocidad mental.','Al final obtenés el Índice TrakEye (0–100) y el perfil por área.']);
+    const scores={}, ids=[];
+    for(const [i,st] of steps.entries()){
+      VT.stepLabel=`DESAFÍO ${i+1} / ${steps.length}`;
+      const r=await TESTS[st.key].fn(st.lv, st.o); r.quick=true; S.tests.push(r); ids.push(r.id);
+      scores[st.d]=scoreOf(st.d, r);
+    }
+    VT.stepLabel=null;
+    const idx=Math.round(mean(DOMS.map(d=>scores[d.k])));
+    const res=mkRes('indice',1,{label:'Índice TrakEye',value:idx,unit:'',dec:0,better:'high'},
+      [['Índice TrakEye',idx,'',0], ...DOMS.map(d=>[d.name,scores[d.k],'',0]), ['Lectura',indexPhrase(idx),'',0]], {scores, ids});
+    res.quick=true;
+    const prev=prevResult(res); S.tests.push(res); saveTests();
+    await showIndexSummary(res, prev);
+  } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en la evaluación: '+e.message); } saveTests(); }
+  VT.stepLabel=null; S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
+  renderTestCards();
+}
+function drawRadar4(x, cx, cy, R, sc, dark, fontPx){
+  x.strokeStyle=dark?'#30363d':'#d0d7de'; x.lineWidth=Math.max(1,R/120);
+  const ang=i=>-Math.PI/2+i*Math.PI/2;
+  [25,50,75,100].forEach(p=>{ x.beginPath(); for(let i=0;i<=4;i++){ const a=ang(i%4); const px=cx+Math.cos(a)*R*p/100, py=cy+Math.sin(a)*R*p/100; i?x.lineTo(px,py):x.moveTo(px,py); } x.stroke(); });
+  for(let i=0;i<4;i++){ x.beginPath(); x.moveTo(cx,cy); x.lineTo(cx+Math.cos(ang(i))*R,cy+Math.sin(ang(i))*R); x.stroke(); }
+  x.beginPath(); DOMS.forEach((d,i)=>{ const v=(sc[d.k]||0)/100, px=cx+Math.cos(ang(i))*R*v, py=cy+Math.sin(ang(i))*R*v; i?x.lineTo(px,py):x.moveTo(px,py); }); x.closePath();
+  x.fillStyle='rgba(163,113,247,.3)'; x.fill(); x.strokeStyle='#a371f7'; x.lineWidth=Math.max(2,R/50); x.stroke();
+  DOMS.forEach((d,i)=>{ const v=(sc[d.k]||0)/100; x.fillStyle='#ffd33d'; x.beginPath(); x.arc(cx+Math.cos(ang(i))*R*v, cy+Math.sin(ang(i))*R*v, Math.max(3,R/30),0,7); x.fill(); });
+  x.font=`600 ${fontPx}px ${FONT}`; x.fillStyle=dark?'#8b949e':'#57606a'; x.textBaseline='middle';
+  [['center',0,-1],['left',1,0],['center',0,1],['right',-1,0]].forEach(([al,dx,dy],i)=>{ x.textAlign=al; x.fillText(DOMS[i].name, cx+dx*(R+10), cy+dy*(R+fontPx)); });
+}
+function drawIndexRing(x, cx, cy, R, v, fontPx){
+  x.lineWidth=R*0.16; x.strokeStyle='#30363d'; x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.stroke();
+  x.strokeStyle='#ffd33d'; x.lineCap='round'; x.beginPath(); x.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+Math.PI*2*v/100); x.stroke(); x.lineCap='butt';
+  x.fillStyle='#e6edf3'; x.font=`800 ${fontPx}px ${FONT}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),cx,cy+fontPx*0.05);
+}
+function shareCanvas(r){
+  const W=1080, H=1350, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), sc=r.detail.scores;
+  const gr=x.createLinearGradient(0,0,W,H); gr.addColorStop(0,'#0d1117'); gr.addColorStop(1,'#1a1030'); x.fillStyle=gr; x.fillRect(0,0,W,H);
+  x.textAlign='left'; x.textBaseline='alphabetic'; x.font=`800 54px ${FONT}`; x.fillStyle='#e6edf3'; x.fillText('Trak',70,110); const tw=x.measureText('Trak').width; x.fillStyle='#2ea043'; x.fillText('Eye',70+tw,110);
+  x.font=`600 26px ${FONT}`; x.fillStyle='#8b949e'; x.fillText('ÍNDICE TRAKEYE · EVALUACIÓN VISUAL Y COGNITIVA',70,155);
+  x.font=`800 46px ${FONT}`; x.fillStyle='#e6edf3'; x.fillText(r.athlete,70,240);
+  x.font=`500 26px ${FONT}`; x.fillStyle='#8b949e'; x.fillText(new Date(r.date).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}),70,282);
+  drawIndexRing(x, 250, 470, 140, r.main.value, 120);
+  x.textAlign='left'; x.font=`800 40px ${FONT}`; x.fillStyle='#ffd33d'; wrapLines(x, indexPhrase(r.main.value), 470, 440, 540, 48);
+  let y=700;
+  DOMS.forEach(d=>{ const v=sc[d.k];
+    x.font=`700 32px ${FONT}`; x.fillStyle='#e6edf3'; x.textAlign='left'; x.fillText(d.name,70,y); x.textAlign='right'; x.fillStyle='#ffd33d'; x.fillText(String(v),W-70,y);
+    x.fillStyle='#30363d'; x.fillRect(70,y+20,W-140,14); const g2=x.createLinearGradient(70,0,W-70,0); g2.addColorStop(0,'#1f6feb'); g2.addColorStop(1,'#a371f7'); x.fillStyle=g2; x.fillRect(70,y+20,(W-140)*v/100,14);
+    x.textAlign='left'; x.font=`500 24px ${FONT}`; x.fillStyle='#8b949e'; x.fillText(d.txt[band(v)],70,y+68); y+=140; });
+  x.textAlign='center'; x.font=`600 24px ${FONT}`; x.fillStyle='#6e7681'; x.fillText('Muestra de rendimiento · no reemplaza una evaluación profesional', W/2, H-50);
+  return c;
+}
+function wrapLines(x, text, X0, Y0, maxW, lh){ const words=text.split(' '); let line='', y=Y0; for(const w of words){ const t=line?line+' '+w:w; if(x.measureText(t).width>maxW && line){ x.fillText(line,X0,y); line=w; y+=lh; } else line=t; } if(line) x.fillText(line,X0,y); }
+async function shareResult(r, blob){
+  const name=`TrakEye_${r.athlete.replace(/[^\w\-]+/g,'_')}_${r.date.slice(0,10)}.png`;
+  try {
+    blob = blob || await new Promise(res=>shareCanvas(r).toBlob(res,'image/png'));
+    const file=new File([blob], name, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Mi Índice TrakEye', text:`Índice TrakEye: ${r.main.value}`}); return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  } catch(e){ if(e && e.name==='AbortError') return; try{ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); }catch(_){} }
+}
+async function showIndexSummary(r, prev){
+  const sc=r.detail.scores, W=VT.W, H=VT.H, wide=W>H*1.1;
+  let blob=null; shareCanvas(r).toBlob(b=>{ blob=b; },'image/png');
+  const rk=rankInfo('indice', r), c=compare(r,prev);
+  clr();
+  const colW = wide ? W/2 : W, cx1 = wide ? W*0.25 : W/2;
+  let y = wide ? Math.max(50, H*0.1) : 44;
+  txt('ÍNDICE TRAKEYE', cx1, y, 14, C.mut, 'center', 700); y+=20;
+  const R = wide ? Math.min(90, H*0.12) : Math.min(70, H*0.08);
+  drawIndexRing(X, cx1, y+R+8, R, r.main.value, R*0.8); y+=2*R+40;
+  txt(indexPhrase(r.main.value), cx1, y, 22, C.y, 'center', 800); y+=26;
+  if(c && !c.same) txt(`${c.better?'Mejor':'Peor'} que la vez anterior (${prev.main.value})`, cx1, y, 15, c.better?C.go:C.bad, 'center', 600), y+=22;
+  if(rk.n>1) txt(`Puesto ${rk.pos}° de ${rk.n} jugadores evaluados`, cx1, y, 15, C.go, 'center', 700), y+=22;
+  const rR = wide ? Math.min(110, (H-y-110)/2.6) : Math.min(80,(H*0.22)/2);
+  if(rR>40){ drawRadar4(X, cx1, y+rR+26, rR, sc, true, 13); y+=2*rR+60; }
+  let x0 = wide ? W/2+10 : 24, bw = (wide ? W/2 : W) - (wide?50:48), by = wide ? Math.max(60,H*0.14) : y;
+  const lh = wide ? Math.min(110,(H-by-110)/4) : Math.min(78,(H-by-100)/4);
+  DOMS.forEach(d=>{ const v=sc[d.k];
+    txt(d.name, x0, by, 17, C.fg, 'left', 700); txt(String(v), x0+bw, by, 22, C.y, 'right', 800);
+    X.fillStyle='#30363d'; X.fillRect(x0, by+14, bw, 8); X.fillStyle='#a371f7'; X.fillRect(x0, by+14, bw*v/100, 8);
+    txt(d.txt[band(v)], x0, by+38, 14, C.mut, 'left', 500); by+=lh; });
+  const bW=Math.min(240,(W-60)/2), bH=54, yb=H-bH-24, b1={x:W/2-bW-8,y:yb,w:bW,h:bH}, b2={x:W/2+8,y:yb,w:bW,h:bH};
+  const btn=(b,l,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect?X.roundRect(b.x,b.y,b.w,b.h,12):X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(l,b.x+b.w/2,b.y+b.h/2,17,'#fff','center',700); };
+  btn(b1,'Compartir resultado','#8957e5'); btn(b2,'Cerrar','#30363d');
+  const inB=(t,b)=>t.x>=b.x&&t.x<=b.x+b.w&&t.y>=b.y-8&&t.y<=b.y+b.h+8;
+  while(true){
+    const t=await new Promise((res,rej)=>{ VT.tapCb=p=>{ VT.tapCb=null; VT.cancel=null; if(inB(p,b1)) shareResult(r, blob); res(p); }; VT.cancel=()=>{ VT.tapCb=null; rej(ABORT); }; });
+    if(inB(t,b2)) return;
+  }
+}
+
+const TESTS = {
+  indice:  { name:'Índice TrakEye', area:'Evaluación rápida', fn:null, hidden:true, noLevels:true, desc:'Evaluación de 5 minutos con 4 desafíos: escaneo visual, atención múltiple, memoria visual y velocidad mental. Puntaje de 0 a 100 por área y global.' },
+  react:   { name:'Tiempo de reacción', area:'Velocidad de reacción', fn:tReact, desc:'Respuesta lo más rápida posible a un estímulo visual central.' },
+  gonogo:  { name:'Go / No-Go', area:'Concentración e inhibición', fn:tGoNoGo, desc:'Responder al verde e inhibir la respuesta al rojo. Mide atención sostenida y control de impulsos.' },
+  periph:  { name:'Visión periférica', area:'Campo visual periférico', fn:tPeriph, desc:'Detectar destellos en 8 direcciones y 3 distancias (parafoveal, periferia media y lejana) sin mover los ojos del centro.' },
+  schulte: { name:'Tabla de Schulte', area:'Atención y búsqueda visual', fn:tSchulte, levels:4, levelNames:['4x4','5x5','6x6','6x6 mezcla'], desc:'Encontrar los números en orden ascendente lo más rápido posible. Con mirada: mapa de calor por casillero, fijaciones por número, números vistos sin reconocer y estrategia de búsqueda.' },
+  mot:     { name:'Seguimiento múltiple (MOT)', area:'Atención dividida', fn:tMOT, desc:'Seguir varias pelotas en movimiento a la vez, como compañeros y rivales en el campo.' },
+  eyehand: { name:'Coordinación ojo-mano', area:'Coordinación visomotora', fn:tEyeHand, desc:'Tocar objetivos que aparecen en lugares aleatorios, lo más rápido y preciso posible.' },
+  memvis:  { name:'Memoria visual', area:'Memoria de trabajo visual', fn:tMemVis, levelNames:['15 luces','20 luces','25 luces'], desc:'Se encienden luces que ya viste más una nueva: tocá solo la nueva. Mide cuánta información visual retenés.' },
+  velmental: { name:'Velocidad mental', area:'Velocidad de procesamiento', fn:tVelMental, levelNames:['8 pares','10 pares','12 pares'], desc:'Encontrá los pares de números repetidos en una grilla de colores, contra reloj.' },
+  eyedom:  { name:'Ojo dominante', area:'Dominancia ocular', fn:tEyeDom, noLevels:true, noGaze:true, desc:'Determina el ojo dominante con los métodos de Miles o Porta (3 repeticiones) y detecta dominancia cruzada ojo-mano. El evaluador marca las respuestas.' },
+  pursuit: { name:'Seguimiento suave', area:'Motilidad ocular', fn:tPursuit, needsGaze:true, desc:'Seguir un objetivo en movimiento solo con los ojos. La cámara mide cuánto te mantenés sobre él.' },
+};
+
+function loadTests(){ try { S.tests=JSON.parse(localStorage.getItem(LS_TESTS)||'[]'); } catch(e){ S.tests=[]; } }
+function saveTests(){
+  for(let tries=0; tries<200; tries++){
+    try { localStorage.setItem(LS_TESTS, JSON.stringify(S.tests)); return; }
+    catch(e){ // sin espacio: quitar la trayectoria de mirada de los resultados más viejos
+      const old=S.tests.find(t=>t.gazeRec && t.gazeRec.s && t.gazeRec.s.length);
+      if(!old) return; old.gazeRec.s=[]; old.gazeRec.trimmed=true;
+    }
+  }
+}
+loadTests();
+S.testMedia={}; // grabaciones y capturas de esta sesión (no se guardan)
+
+/* ---------- grabación de pantalla + mirada en los tests ---------- */
+function startRec(){
+  try {
+    if(!vtc.captureStream || !window.MediaRecorder) return null;
+    const st=vtc.captureStream(30);
+    const types=['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+    const mt=types.find(t=>MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t));
+    const rec=new MediaRecorder(st, mt ? { mimeType:mt, videoBitsPerSecond:2500000 } : undefined);
+    const chunks=[]; rec.ondataavailable=e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+    rec.start(1000);
+    return { rec, chunks, type:rec.mimeType||mt||'video/webm' };
+  } catch(e){ return null; }
+}
+function stopRec(R){
+  return new Promise(res=>{
+    if(!R) return res(null);
+    if(R.rec.state==='inactive') return res(R.chunks.length?URL.createObjectURL(new Blob(R.chunks,{type:R.type})):null);
+    R.rec.onstop=()=>res(R.chunks.length?URL.createObjectURL(new Blob(R.chunks,{type:R.type})):null);
+    try { R.rec.stop(); } catch(e){ res(null); }
+    setTimeout(()=>res(null),4000);
+  });
+}
+function takeSnap(){
+  try {
+    if(VT.snaps.length>=900) return;
+    const w=Math.min(420, Math.round(VT.W)), h=Math.round(w*VT.H/VT.W);
+    const c=VT.snapCanvas||(VT.snapCanvas=document.createElement('canvas')); if(c.width!==w||c.height!==h){ c.width=w; c.height=h; }
+    c.getContext('2d').drawImage(vtc,0,0,w,h);
+    VT.snaps.push({ t:performance.now()-VT.t0, url:c.toDataURL('image/jpeg',.6) });
+  } catch(e){}
+}
+function buildGazeRec(dur){
+  const t0=VT.t0, W=VT.W, H=VT.H;
+  const all=VT.gaze.filter(s=>s.t>=t0 && s.t<=t0+dur);
+  const val=all.filter(s=>s.valid);
+  const s=[]; let lastT=-1e9;
+  for(const g of val){ const t=g.t-t0; if(t-lastT<45) continue; lastT=t; s.push([Math.round(t),Math.round(g.x),Math.round(g.y),+g.h.toFixed(3),+g.v.toFixed(3)]); }
+  const fx=fixations(val.map(g=>({ t:g.t-t0, vt:(g.t-t0)/1000, x:g.x, y:g.y, u:g.x/W, v:g.y/H, valid:true })));
+  const amps=[]; for(let i=1;i<fx.length;i++) amps.push(Math.hypot(fx[i].x-fx[i-1].x, fx[i].y-fx[i-1].y));
+  const tol=gazeTol(), cx=W/2, cy=H/2;
+  const center=val.length ? 100*val.filter(g=>Math.hypot(g.x-cx,g.y-cy)<tol).length/val.length : null;
+  const disp=val.length>2 ? Math.sqrt((sdev(val.map(g=>g.x))**2+sdev(val.map(g=>g.y))**2)/2) : null;
+  const pxDeg=52/1.146; // ~52 px/cm en iPad a ~50 cm
+  const m=[
+    ['Muestras de mirada válidas', all.length?100*val.length/all.length:null, '%', 0],
+    ['Fijaciones', fx.length, '', 0],
+    ['Duración media de fijación', mean(fx.map(f=>f.dur)), 'ms', 0],
+    ['Fijaciones por segundo', dur?fx.length/(dur/1000):null, '', 2],
+    ['Movimientos sacádicos', Math.max(0,fx.length-1), '', 0],
+    ['Amplitud media de sacada', amps.length?mean(amps)/pxDeg:null, '°', 1],
+    ['Mirada en el centro de la pantalla', center, '%', 0],
+    ['Dispersión de la mirada', disp!=null?disp/pxDeg:null, '°', 1],
+  ];
+  return { W, H, dur:Math.round(dur), calErr:S.calErr, s,
+    fix:fx.map(f=>({ x:Math.round(f.x), y:Math.round(f.y), u:+f.u.toFixed(4), v:+f.v.toFixed(4), t:Math.round(f.vt*1000), dur:Math.round(f.dur) })), m };
+}
+const prevResult = r => S.tests.filter(o=>o.athlete===r.athlete && o.key===r.key && o.level===r.level && !!o.quick===!!r.quick && o.date<r.date).at(-1);
+function compare(r, p){
+  if(!p || typeof r.main.value!=='number' || typeof p.main.value!=='number') return null;
+  const d=r.main.value-p.main.value, better = r.main.better==='low' ? d<0 : d>0;
+  return { d, better, same: Math.abs(d)<1e-9 };
+}
+
+async function runVisionTest(key){
+  const T=TESTS[key];
+  if(T.needsGaze && !S.model){ alert('Este test necesita la cámara activa y la calibración de mirada.'); return; }
+  VT.useGaze = !!S.model && !T.noGaze && (T.needsGaze || $('optVtGaze').checked);
+  if(VT.useGaze && sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes del test.'); return; }
+  VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
+  $('vt').classList.add('on'); vtSetup(); newFilter();
+  let R=null, snapTimer=null;
+  S.offset={x:0,y:0};
+  if(VT.useGaze){ // re-centrado rápido: corrige la deriva desde la calibración
+    clr(); cross(VT.W/2,VT.H/2,18); txt('Mirá la cruz',VT.W/2,VT.H/2+50,18,C.mut,'center',500);
+    const arr=[]; S.collect={from:performance.now()+350, arr}; await sleep(1300); S.collect=null;
+    const ps=arr.filter(isOpen).map(f=>predictWith(S.model,f));
+    if(ps.length>=8){ let dx=median(ps.map(p=>p.x))-VT.W/2, dy=median(ps.map(p=>p.y))-VT.H/2; const m=Math.hypot(dx,dy), lim=180; if(m>lim){ dx*=lim/m; dy*=lim/m; } S.offset={x:dx,y:dy}; }
+  }
+  VT.t0=performance.now();
+  if(VT.useGaze){ S.mode='vt'; R=startRec(); VT.t0=performance.now(); snapTimer=setInterval(takeSnap,250); }
+  const lv=S.levels[key]||1;
+  let view=null;
+  try {
+    const res=await T.fn(lv);
+    const dur=performance.now()-VT.t0;
+    S.mode='idle'; clearInterval(snapTimer);
+    if(VT.useGaze){
+      takeSnap();
+      const url=await stopRec(R); R=null;
+      res.gazeRec=buildGazeRec(dur);
+      const snap=VT.snaps.length ? VT.snaps.reduce((b,s)=>Math.abs(s.t-dur/2)<Math.abs(b.t-dur/2)?s:b).url : null;
+      S.testMedia[res.id]={ videoUrl:url, snap, frames:VT.snaps.slice() };
+      const ids=Object.keys(S.testMedia).filter(k=>S.testMedia[k].frames && S.testMedia[k].frames.length);
+      ids.slice(0,Math.max(0,ids.length-10)).forEach(k=>{ S.testMedia[k].frames=[]; }); // memoria: cuadros solo de los últimos 10 tests
+    }
+    const prev=prevResult(res);
+    S.tests.push(res); saveTests();
+    if(await showSummary(res, prev)==='view') view=res;
+  } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en el test: '+e.message); } }
+  clearInterval(snapTimer); if(R) stopRec(R);
+  S.offset={x:0,y:0};
+  S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
+  renderTestCards();
+  if(view) openTestView(view);
+}
+async function showSummary(r, prev){
+  const g=r.gazeRec;
+  const cx=VT.W/2; clr();
+  let y=Math.max(70, VT.H/2-200);
+  txt(r.name, cx, y, 26, C.fg, 'center', 700); y+=50;
+  txt(fmtV(r.main.value,r.main.unit,r.main.dec), cx, y+10, 64, C.y, 'center', 700); y+=64;
+  txt(TESTS[r.key]&&TESTS[r.key].noLevels ? r.main.label : r.main.label+` · nivel ${r.level}`, cx, y, 16, C.mut, 'center', 500); y+=34;
+  const c=compare(r,prev);
+  if(c) txt(c.same ? 'Igual que la vez anterior' : `${c.better?'Mejor':'Peor'} que la vez anterior (${fmtV(prev.main.value,prev.main.unit,prev.main.dec)})`, cx, y, 18, c.same?C.mut:c.better?C.go:C.bad, 'center', 600);
+  y+=44;
+  const rows=r.metrics.slice();
+  if(g) rows.push(['Mirada: fijaciones', g.m[1][1], '', 0], ['Mirada en el centro', g.m[6][1], '%', 0]);
+  const lh=Math.min(30, Math.max(22, (VT.H-y-120)/rows.length));
+  rows.forEach(([l,v,u,d])=>{ txt(l, cx-14, y, 17, C.mut, 'right', 500); txt(fmtV(v,u,d), cx+14, y, 17, C.fg, 'left', 600); y+=lh; });
+  if(!g){ txt('Tocá para cerrar', cx, VT.H-44, 18, C.acc, 'center', 700); await vtWait(null,true); return 'close'; }
+  if(!g.s.length) txt('Atención: la cámara no detectó los ojos durante el test', cx, VT.H-112, 16, C.warn, 'center', 600);
+  const bw=Math.min(260,(VT.W-60)/2), bh=56, by=VT.H-bh-28, b1={x:cx-bw-8,y:by,w:bw,h:bh}, b2={x:cx+8,y:by,w:bw,h:bh};
+  const btn=(b,label,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect ? X.roundRect(b.x,b.y,b.w,b.h,12) : X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(label,b.x+b.w/2,b.y+b.h/2,17,'#fff','center',700); };
+  btn(b1,'Ver movimiento ocular',C.acc); btn(b2,'Cerrar','#30363d');
+  const tap=await vtWait(null,true);
+  return (tap.x>=b1.x && tap.x<=b1.x+b1.w && tap.y>=b1.y-10 && tap.y<=b1.y+b1.h+10) ? 'view' : 'close';
+}
+
+/* ---------- visor de mirada de un test ---------- */
+const tvv=$('tvVideo'), tvc=$('tvCanvas'), tvx=tvc.getContext('2d'), trc=$('tvTrace'), trx=trc.getContext('2d');
+const TV={ r:null, media:{}, pts:[], t:0, playing:false, last:0, mode:'replay', heat:null, seeking:false, img:null, from:'tests' };
+function openTestView(r){
+  const g=r.gazeRec; if(!g) return;
+  TV.r=r; TV.media=S.testMedia[r.id]||{}; TV.frames=[]; TV.t=0; TV.playing=false; TV.heat=null; TV.img=null; TV.from=S.tab;
+  TV.pts=g.s.map(a=>({ t:a[0], x:a[1], y:a[2], u:a[1]/g.W, v:a[2]/g.H, h:a[3], vv:a[4] }));
+  $('tvWrap').style.aspectRatio=`${g.W}/${g.H}`;
+  if(TV.media.videoUrl){ tvv.style.display='block'; tvv.src=TV.media.videoUrl; tvv.load(); $('tvNoVideo').style.display='none'; }
+  else { tvv.pause(); tvv.removeAttribute('src'); tvv.style.display='none';
+    TV.frames=(TV.media.frames||[]).map(fr=>({ t:fr.t, url:fr.url, im:null }));
+    TV.frames.forEach(fr=>{ const im=new Image(); im.onload=()=>{ fr.im=im; }; im.src=fr.url; });
+    if(!TV.frames.length && TV.media.snap){ const im=new Image(); im.onload=()=>{ TV.img=im; }; im.src=TV.media.snap; } }
+  const nPts=g.s.length;
+  const note = !nPts ? '<span class="badc">No se registraron puntos de mirada en este test: la cámara no detectó los ojos (revisá luz, distancia y que la cara se vea completa), o la trayectoria se borró por falta de espacio.</span>'
+    : TV.media.videoUrl ? '' : (TV.frames&&TV.frames.length) ? '' : 'No hay imagen de la pantalla para este test (es de una sesión anterior). Se muestra solo la mirada.';
+  $('tvNoVideo').innerHTML=note; $('tvNoVideo').style.display = note ? 'block' : 'none';
+  $('tvTitle').textContent=`${r.athlete} · ${r.name}`;
+  $('tvSub').textContent=`${new Date(r.date).toLocaleString('es-AR')} · nivel ${r.level}`+(g.trimmed?' · trayectoria eliminada por falta de espacio':'');
+  const hasCells=!!(r.key==='schulte' && r.detail && r.detail.schulte && r.detail.schulte.dwell);
+  $('tvCellsBtn').style.display=hasCells?'':'none';
+  setTvMode(hasCells?'cells':'replay'); renderTvMetrics();
+  $('home').style.display='none'; $('analysis').style.display='none'; $('tview').style.display='block'; scrollTo(0,0);
+  requestAnimationFrame(tvLoop);
+}
+$('tvBack').addEventListener('click', ()=>{ tvv.pause(); TV.playing=false; $('tview').style.display='none'; $('home').style.display='block'; showTab(TV.from||'results'); });
+$('tvModes').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setTvMode(b.dataset.m)));
+function setTvMode(m){ TV.mode=m; $('tvModes').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.m===m)); }
+$('tvPlay').addEventListener('click', ()=>{
+  const dur=TV.r.gazeRec.dur;
+  if(TV.media.videoUrl){ if(tvv.paused){ if(TV.t>=dur-50){ tvv.currentTime=0; TV.t=0; } tvv.play().catch(()=>{}); } else tvv.pause(); }
+  else { if(TV.t>=dur) TV.t=0; TV.playing=!TV.playing; TV.last=performance.now(); }
+});
+const tvSeek=$('tvSeek');
+tvSeek.addEventListener('pointerdown',()=>TV.seeking=true);
+tvSeek.addEventListener('pointerup',()=>TV.seeking=false);
+tvSeek.addEventListener('input', e=>{ TV.t=e.target.value/1000*TV.r.gazeRec.dur; if(TV.media.videoUrl){ try{ tvv.currentTime=TV.t/1000; }catch(_){} } });
+const mmss = ms => { const s=Math.max(0,Math.round(ms/1000)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; };
+function tvLoop(){
+  if($('tview').style.display==='none') return;
+  requestAnimationFrame(tvLoop);
+  const dur=TV.r.gazeRec.dur;
+  if(TV.media.videoUrl){ if(!tvv.paused && !TV.seeking) TV.t=Math.min(dur, tvv.currentTime*1000); TV.playing=!tvv.paused; }
+  else if(TV.playing){ const now=performance.now(); TV.t+=now-TV.last; TV.last=now; if(TV.t>=dur){ TV.t=dur; TV.playing=false; } }
+  if(!TV.seeking) tvSeek.value=Math.round(TV.t/dur*1000);
+  $('tvPlay').textContent=TV.playing?'❚❚':'▶︎';
+  $('tvTime').textContent=`${mmss(TV.t)} / ${mmss(dur)}`;
+  tvDraw(); drawTrace(trx, trc, TV.pts, dur, TV.t, true);
+}
+function fitCanvas(c){ const r=c.getBoundingClientRect(), d=devicePixelRatio||1, w=Math.round(r.width*d), h=Math.round(r.height*d); if(c.width!==w||c.height!==h){ c.width=w; c.height=h; return true; } return false; }
+function tvDraw(){
+  if(fitCanvas(tvc)) TV.heat=null;
+  const W=tvc.width, H=tvc.height, d=devicePixelRatio||1, r={x:0,y:0,w:W,h:H};
+  tvx.clearRect(0,0,W,H);
+  if(!TV.media.videoUrl){
+    tvx.fillStyle='#0b0f14'; tvx.fillRect(0,0,W,H);
+    let bg=null;
+    if(TV.frames && TV.frames.length){ for(const fr of TV.frames){ if(fr.t<=TV.t+1){ if(fr.im) bg=fr.im; } else break; } if(!bg) bg=(TV.frames.find(fr=>fr.im)||{}).im; }
+    if(bg){ tvx.globalAlpha = TV.mode==='replay' ? 1 : .55; tvx.drawImage(bg,0,0,W,H); tvx.globalAlpha=1; }
+    else if(TV.img){ tvx.globalAlpha=.35; tvx.drawImage(TV.img,0,0,W,H); tvx.globalAlpha=1; }
+  }
+  if(TV.mode==='replay'){
+    const pts=TV.pts.filter(p=>p.t<=TV.t && p.t>=TV.t-600);
+    tvx.lineWidth=3*d; tvx.lineCap='round';
+    for(let i=1;i<pts.length;i++){
+      if(pts[i].t-pts[i-1].t>200) continue;
+      tvx.strokeStyle=`rgba(255,211,61,${(i/pts.length)*0.85})`;
+      tvx.beginPath(); tvx.moveTo(...P(r,pts[i-1].u,pts[i-1].v)); tvx.lineTo(...P(r,pts[i].u,pts[i].v)); tvx.stroke();
+    }
+    const last=pts.at(-1);
+    if(last && TV.t-last.t<250){ const [x,y]=P(r,last.u,last.v); tvx.fillStyle='rgba(255,211,61,.3)'; tvx.strokeStyle='#ffd33d'; tvx.lineWidth=3*d; tvx.beginPath(); tvx.arc(x,y,16*d,0,7); tvx.fill(); tvx.stroke(); }
+  } else if(TV.mode==='heat'){
+    if(!TV.heat) TV.heat=buildHeat(TV.pts, W, H);
+    tvx.drawImage(TV.heat.c,0,0,W,H);
+  } else if(TV.mode==='cells') drawSchulteCells(tvx, W, H, TV.r, TV.t, TV.pts, Math.max(d, W/TV.r.gazeRec.W));
+  else renderPath(tvx, r, TV.r.gazeRec.fix, d);
+}
+function drawTrace(X2, c, pts, dur, cursor, dark){
+  if(c) fitCanvas(c);
+  const W=X2.canvas.width, H=X2.canvas.height, s=c?(devicePixelRatio||1):2;
+  const pl=40*s, pr=10*s, pt=10*s, pb=22*s, cw=W-pl-pr, ch=H-pt-pb;
+  X2.fillStyle=dark?'#161b22':'#ffffff'; X2.fillRect(0,0,W,H);
+  X2.strokeStyle=dark?'#30363d':'#d0d7de'; X2.lineWidth=1*s; X2.font=`500 ${10*s}px -apple-system,Helvetica,sans-serif`;
+  X2.fillStyle=dark?'#8b949e':'#57606a'; X2.textAlign='right'; X2.textBaseline='middle';
+  [0,25,50,75,100].forEach(p=>{ const y=pt+ch*(1-p/100); X2.beginPath(); X2.moveTo(pl,y); X2.lineTo(W-pr,y); X2.stroke(); X2.fillText(p+'%',pl-5*s,y); });
+  X2.textAlign='center'; X2.textBaseline='top';
+  const step=dur>60000?10000:dur>20000?5000:2000;
+  for(let t=0;t<=dur;t+=step){ const x=pl+cw*t/dur; X2.fillText(mmss(t),x,pt+ch+5*s); }
+  const line=(key,col)=>{ X2.strokeStyle=col; X2.lineWidth=1.8*s; X2.beginPath(); let prev=null;
+    for(const p of pts){ const v=key==='x'?p.u:p.v; const x=pl+cw*p.t/dur, y=pt+ch*(1-clamp(v,0,1));
+      if(!prev || p.t-prev.t>200) X2.moveTo(x,y); else X2.lineTo(x,y); prev=p; } X2.stroke(); };
+  line('x','#58a6ff'); line('y','#f0883e');
+  if(cursor!=null){ const x=pl+cw*clamp(cursor/dur,0,1); X2.strokeStyle=dark?'#e6edf3':'#24292f'; X2.lineWidth=1.5*s; X2.beginPath(); X2.moveTo(x,pt); X2.lineTo(x,pt+ch); X2.stroke(); }
+}
+trc.addEventListener('pointerdown', e=>{
+  const r=trc.getBoundingClientRect(), pl=40, pr=10, x=clamp((e.clientX-r.left-pl)/(r.width-pl-pr),0,1);
+  TV.t=x*TV.r.gazeRec.dur; if(TV.media.videoUrl){ try{ tvv.currentTime=TV.t/1000; }catch(_){} }
+});
+function renderTvMetrics(){
+  const r=TV.r, g=r.gazeRec;
+  const kpi=(v,l)=>`<div class="kpi"><b>${v}</b><span>${esc(l)}</span></div>`;
+  let h=`<div style="font-weight:600;margin-bottom:8px">Resultado del test</div><div class="kpis">`+
+    r.metrics.map(([l,v,u,d])=>kpi(fmtV(v,u,d),l)).join('')+'</div>';
+  h+=`<div style="font-weight:600;margin:6px 0 8px">Mirada durante el test</div><div class="kpis">`+
+    g.m.map(([l,v,u,d])=>kpi(fmtV(v,u,d),l)).join('')+'</div>';
+  const sd=r.detail&&r.detail.schulte;
+  if(sd && sd.perNum && sd.perNum.length){
+    const pn=sd.perNum, mxT=Math.max(...pn.map(p=>p[1]));
+    h+=`<div style="font-weight:600;margin:14px 0 6px">Búsqueda número por número</div><div class="sub">Barra = tiempo de búsqueda · 👁 = lo miró antes de encontrarlo y siguió de largo · ↺ = re-visitas a números ya encontrados</div><div class="tblwrap"><table><tr><th>N°</th><th>Tiempo</th><th style="width:40%"></th><th>Fijaciones</th><th>Visto</th><th>Re-visitas</th></tr>`+
+      pn.map(p=>`<tr><td><b>${p[0]}</b></td><td>${(p[1]/1000).toFixed(2)} s</td><td><div style="height:8px;border-radius:4px;background:${p[1]===mxT?'#f85149':'#1f6feb'};width:${Math.max(3,100*p[1]/mxT)}%"></div></td><td>${p[2]}</td><td>${p[3]?'👁':''}</td><td>${p[4]?'↺ '+p[4]:''}</td></tr>`).join('')+'</table></div>';
+  }
+  h+=`<div class="status">Los grados son aproximados (iPad a ~50 cm). Error de calibración en este test: ${g.calErr!=null?Math.round(g.calErr)+' px':'—'}.</div>`;
+  $('tvMetrics').innerHTML=h;
+}
+function renderTestCards(){
+  const a=curAthlete();
+  const lastIdx=S.tests.filter(r=>r.key==='indice' && r.athlete===a).at(-1);
+  $('testGrid').innerHTML=`<div class="tcard" style="grid-column:1/-1;background:linear-gradient(135deg,#1f2a4a,#2a1747);border-color:#3d2b6b">
+      <div class="tarea" style="color:#d2a8ff">Evaluación rápida · 5 minutos</div><h3 style="font-size:22px">Índice TrakEye</h3>
+      <p class="sub">4 desafíos seguidos (escaneo visual, atención múltiple, memoria visual y velocidad mental). Resultado de 0 a 100 por área y global, con radar, ranking del plantel e imagen para compartir.</p>
+      <div class="sub">${lastIdx?`Último índice: <b style="color:#ffd33d;font-size:18px">${lastIdx.main.value}</b> · ${new Date(lastIdx.date).toLocaleDateString('es-AR')}`:'Todavía sin índice para este jugador'}</div>
+      <div class="row"><button class="go" id="btnQuick" style="background:#8957e5">Empezar evaluación rápida</button>${lastIdx?`<button class="sec" id="btnShareIdx">Compartir último resultado</button>`:''}</div></div>`+
+    Object.entries(TESTS).filter(([k,T])=>!T.hidden).map(([k,T])=>{
+    const last=S.tests.filter(r=>r.key===k && r.athlete===a).at(-1), lv=S.levels[k]||1, lvTxt=T.noLevels?'':` · nivel ${last?last.level:''}`;
+    const blocked=T.needsGaze && !S.model;
+    return `<div class="tcard"><div class="tarea">${esc(T.area)}</div><h3>${esc(T.name)}</h3><p class="sub">${esc(T.desc)}</p>
+      ${T.needsGaze?`<div class="sub ${blocked?'warnc':'ok'}">${blocked?'Requiere cámara y calibración':'Usa seguimiento ocular'}</div>`:''}
+      ${T.noLevels?'':`<div class="lv" data-k="${k}">${[...Array(T.levels||3)].map((_,i)=>i+1).map(n=>`<button class="${n===lv?'on':''}" data-n="${n}">${T.levelNames?T.levelNames[n-1]:'Nivel '+n}</button>`).join('')}</div>`}
+      <div class="sub">${last?`Último: <b style="color:var(--tx)">${fmtV(last.main.value,last.main.unit,last.main.dec)}</b> · ${new Date(last.date).toLocaleDateString('es-AR')}${lvTxt}`:'Sin resultados para este jugador'}</div>
+      <button class="go tstart" data-k="${k}" ${blocked?'disabled':''}>Empezar</button></div>`;
+  }).join('');
+  $('testGrid').querySelectorAll('.lv button').forEach(b=>b.addEventListener('click',()=>{ S.levels[b.parentElement.dataset.k]=+b.dataset.n; renderTestCards(); }));
+  $('testGrid').querySelectorAll('.tstart').forEach(b=>b.addEventListener('click',()=>runVisionTest(b.dataset.k)));
+  $('btnQuick').addEventListener('click', runQuickEval);
+  if($('btnShareIdx')) $('btnShareIdx').addEventListener('click',()=>shareResult(lastIdx));
+}
+
+/* ================= resultados ================= */
+function athletes(){
+  const set=new Set([...S.tests.map(t=>t.athlete), ...S.trials.map(t=>t.athlete)]);
+  set.add(curAthlete());
+  return [...set];
+}
+function renderResults(){
+  const sel=$('resAthlete'), prev=sel.value, list=athletes();
+  sel.innerHTML=list.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  sel.value = list.includes(prev) ? prev : curAthlete();
+  const a=sel.value;
+  const tests=S.tests.filter(t=>t.athlete===a).slice().reverse();
+  $('testHist').innerHTML = !tests.length ? 'Sin resultados de tests para este jugador' :
+    '<table><tr><th>Fecha</th><th>Test</th><th>Nivel</th><th>Resultado</th><th>Vs. anterior</th><th>Mirada</th></tr>'+
+    tests.map(t=>{ const c=compare(t, prevResult(t));
+      return `<tr><td>${new Date(t.date).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td><td>${esc(t.name)}</td><td>${TESTS[t.key]&&TESTS[t.key].noLevels?'—':t.level}</td>
+      <td><b>${fmtV(t.main.value,t.main.unit,t.main.dec)}</b></td><td class="${c?(c.same?'':c.better?'ok':'badc'):''}">${c?(c.same?'=':c.better?'Mejor':'Peor'):'—'}</td>
+      <td>${t.gazeRec?`<button class="sec tvopen" data-id="${esc(t.id)}" style="padding:5px 10px;font-size:13px">Ver</button>`:'—'}</td></tr>`; }).join('')+'</table>';
+  $('testHist').className = tests.length ? 'tblwrap' : 'tblwrap status';
+  $('testHist').querySelectorAll('.tvopen').forEach(b=>b.addEventListener('click',()=>{ const r=S.tests.find(t=>t.id===b.dataset.id); if(r) openTestView(r); }));
+  const trials=S.trials.map((t,i)=>({t,i})).filter(o=>o.t.athlete===a);
+  const el=$('trialList');
+  if(!trials.length){ el.className='status'; el.textContent='Todavía no hay análisis de video para este jugador'; }
+  else {
+    el.className='';
+    el.innerHTML=trials.map(({t,i})=>`<div class="trial" data-i="${i}"><div><b>${esc(t.clip)}</b></div>
+      <div class="sub">${t.fix.length} fijaciones · ${Math.round(validPct(t))}% muestras válidas${t.decision?` · ${esc(t.decision)} (${t.rt.toFixed(2)} s)`:''} · tocá para analizar</div></div>`).join('');
+    el.querySelectorAll('.trial').forEach(d=>d.addEventListener('click',()=>openAnalysis(+d.dataset.i)));
+  }
+  renderRanking();
+  $('btnClearTests').disabled = !tests.length;
+  $('btnTestsCsv').disabled = !S.tests.length;
+  refreshButtons();
+}
+$('resAthlete').addEventListener('change', renderResults);
+function renderRanking(){
+  const sel=$('rankSel'), prev=sel.value, combos=new Map();
+  S.tests.forEach(t=>{ if(typeof t.main.value!=='number') return; const id=`${t.key}|${t.level}|${t.quick?1:0}`; if(!combos.has(id)) combos.set(id, t); });
+  const label=t=>t.key==='indice'?'Índice TrakEye (evaluación rápida)':`${TESTS[t.key]?TESTS[t.key].name:t.name}${TESTS[t.key]&&TESTS[t.key].noLevels?'':' · '+(TESTS[t.key]&&TESTS[t.key].levelNames?TESTS[t.key].levelNames[t.level-1]:'nivel '+t.level)}${t.quick&&t.key!=='indice'?' (eval. rápida)':''} — ${t.main.label}`;
+  const ids=[...combos.keys()].sort((a,b)=>a.startsWith('indice')?-1:b.startsWith('indice')?1:0);
+  sel.innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(label(combos.get(id)))}</option>`).join('');
+  if(ids.includes(prev)) sel.value=prev;
+  const el=$('rankTbl'); if(!ids.length){ el.className='tblwrap status'; el.textContent='Sin datos todavía'; return; }
+  const ref=combos.get(sel.value), rk=rankInfo(ref.key, ref), me=$('resAthlete').value;
+  el.className='tblwrap';
+  el.innerHTML='<table><tr><th>#</th><th>Jugador</th><th>Resultado</th><th>Fecha</th></tr>'+rk.arr.map((t,i)=>`<tr${t.athlete===me?' style="color:#ffd33d"':''}><td><b>${i+1}°</b></td><td>${esc(t.athlete)}</td><td><b>${fmtV(t.main.value,t.main.unit,t.main.dec)}</b></td><td>${new Date(t.date).toLocaleDateString('es-AR')}</td></tr>`).join('')+'</table><div class="status">Último resultado de cada jugador en esta prueba.</div>';
+}
+$('rankSel').addEventListener('change', renderRanking);
+$('btnClearTests').addEventListener('click', ()=>{
+  const a=$('resAthlete').value;
+  if(!confirm(`¿Borrar todo el historial de tests de «${a}»? No se puede deshacer.`)) return;
+  S.tests=S.tests.filter(t=>t.athlete!==a); saveTests(); renderResults();
+});
+
+/* ================= CSV ================= */
+function download(name,text){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿'+text],{type:'text/csv;charset=utf-8'}));
+  a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+}
+const csvCell = v => v==null ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g,'""')}"` : v;
+const csv = rows => rows.map(r=>r.map(csvCell).join(',')).join('\n');
+const stamp = () => new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+$('btnRaw').addEventListener('click', ()=>{
+  const rows=[['atleta','video','fecha','t_ms','tiempo_video_s','valido','x_px','y_px','u','v']];
+  for(const t of S.trials){ const t0=t.samples.length?t.samples[0].t:0;
+    for(const s of t.samples) rows.push([t.athlete,t.clip,t.date.toISOString(),Math.round(s.t-t0),s.vt.toFixed(3),s.valid?1:0,
+      s.valid?Math.round(s.x):'',s.valid?Math.round(s.y):'',s.valid?s.u.toFixed(4):'',s.valid?s.v.toFixed(4):'']); }
+  download(`trakeye_mirada_${stamp()}.csv`, csv(rows));
+});
+$('btnSum').addEventListener('click', ()=>{
+  const rows=[['atleta','video','fecha','error_calib_px','muestras_validas_pct','n_fijaciones','dur_media_fijacion_ms','fijaciones_por_s','respuesta','tiempo_respuesta_s','zona','permanencia_pct','primera_fijacion_s','fijaciones_zona']];
+  for(const t of S.trials){
+    const base=[t.athlete,t.clip,t.date.toISOString(),t.calErr!=null?Math.round(t.calErr):'',validPct(t).toFixed(1),t.fix.length,
+      t.fix.length?Math.round(mean(t.fix.map(f=>f.dur))):'',t.duration?(t.fix.length/t.duration).toFixed(2):'',t.decision||'',t.rt!=null?t.rt.toFixed(2):''];
+    const list=aoisOf(t);
+    if(!list.length) rows.push([...base,'','','','']);
+    for(const a of list){ const s=aoiStats(t,a); rows.push([...base,a.name,s.dwell.toFixed(1),s.ttff!=null?s.ttff.toFixed(2):'',s.nfix]); }
+  }
+  download(`trakeye_video_${stamp()}.csv`, csv(rows));
+});
+$('btnTestsCsv').addEventListener('click', ()=>{
+  const rows=[['atleta','fecha','test','nivel','seguimiento_ocular','metrica','valor','unidad']];
+  for(const t of S.tests){
+    for(const [l,v,u,d] of t.metrics) rows.push([t.athlete,t.date,t.name,t.level,t.gaze?1:0,l,typeof v==='number'?v.toFixed(d):v,u]);
+    if(t.gazeRec) for(const [l,v,u,d] of t.gazeRec.m) rows.push([t.athlete,t.date,t.name,t.level,1,'Mirada - '+l,typeof v==='number'?v.toFixed(d):v,u]);
+  }
+  download(`trakeye_tests_${stamp()}.csv`, csv(rows));
+});
+
+/* ================= informe PDF ================= */
+const clean = s => String(s).replace(/[—–]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/…/g,'...').replace(/[•·]/g,'-').replace(/≈/g,'~').replace(/[^\x00-\xFF]/g,'');
+const plain = (v,u,d) => clean(fmtV(v,u,d));
+
+function barChartImg(vals, labels, unit, dec){
+  const W=900, H=300, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  x.fillStyle='#fff'; x.fillRect(0,0,W,H);
+  const pl=20, pr=20, pt=36, pb=44, cw=W-pl-pr, ch=H-pt-pb;
+  const nums=vals.map(v=>v??0), max=Math.max(...nums,1e-9)*1.15;
+  const bw=Math.min(90, cw/vals.length*0.6), gap=cw/vals.length;
+  x.strokeStyle='#d0d7de'; x.lineWidth=2; x.beginPath(); x.moveTo(pl,pt+ch); x.lineTo(W-pr,pt+ch); x.stroke();
+  x.font='600 22px Helvetica,Arial,sans-serif'; x.textAlign='center';
+  vals.forEach((v,i)=>{
+    const h=(nums[i]/max)*ch, bx=pl+gap*i+(gap-bw)/2, by=pt+ch-h;
+    x.fillStyle = i===vals.length-1 ? '#1f6feb' : '#9cc3f5'; x.fillRect(bx,by,bw,h);
+    x.fillStyle='#24292f'; x.fillText(v==null?'-':fmtV(v,unit,dec), bx+bw/2, by-10);
+    x.fillStyle='#57606a'; x.font='500 20px Helvetica,Arial,sans-serif'; x.fillText(labels[i], bx+bw/2, H-14); x.font='600 22px Helvetica,Arial,sans-serif';
+  });
+  return c.toDataURL('image/png');
+}
+function radarImg(byDir){
+  const S2=520, c=document.createElement('canvas'); c.width=S2; c.height=S2; const x=c.getContext('2d');
+  x.fillStyle='#fff'; x.fillRect(0,0,S2,S2);
+  const cx=S2/2, cy=S2/2, R=180;
+  x.strokeStyle='#d0d7de'; x.lineWidth=1.5;
+  [25,50,75,100].forEach(p=>{ x.beginPath(); for(let d=0;d<=8;d++){ const a=d*Math.PI/4, px=cx+Math.cos(a)*R*p/100, py=cy-Math.sin(a)*R*p/100; d?x.lineTo(px,py):x.moveTo(px,py); } x.stroke(); });
+  x.font='500 18px Helvetica,Arial,sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+  for(let d=0;d<8;d++){ const a=d*Math.PI/4; x.beginPath(); x.moveTo(cx,cy); x.lineTo(cx+Math.cos(a)*R,cy-Math.sin(a)*R); x.stroke();
+    x.fillStyle='#57606a'; x.fillText(`${DIRS[d]} ${byDir[d]==null?'-':Math.round(byDir[d])+'%'}`, cx+Math.cos(a)*(R+52), cy-Math.sin(a)*(R+30)); }
+  x.beginPath(); for(let d=0;d<=8;d++){ const v=(byDir[d%8]??0)/100, a=d*Math.PI/4, px=cx+Math.cos(a)*R*v, py=cy-Math.sin(a)*R*v; d?x.lineTo(px,py):x.moveTo(px,py); }
+  x.fillStyle='rgba(31,111,235,.25)'; x.fill(); x.strokeStyle='#1f6feb'; x.lineWidth=3; x.stroke();
+  return c.toDataURL('image/png');
+}
+function grabFrame(url, frac){
+  return new Promise(res=>{
+    const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.preload='auto';
+    v.style.cssText='position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;pointer-events:none';
+    document.body.appendChild(v);
+    let done=false; const fin=ok=>{ if(done) return; done=true; res(ok?v:null); if(!ok) v.remove(); };
+    v.onloadeddata=()=>{ v.currentTime=Math.max(0.05,(v.duration||1)*frac); };
+    v.onseeked=()=>fin(true); v.onerror=()=>fin(false); setTimeout(()=>fin(false),7000);
+    v.src=url; v.load();
+  });
+}
+async function trialImages(t){
+  const v=await grabFrame(t.url,0.5);
+  const ar=v&&v.videoWidth ? v.videoWidth/v.videoHeight : 16/9, W=720, H=Math.round(W/ar), r={x:0,y:0,w:W,h:H};
+  const mk=()=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+    x.fillStyle='#000'; x.fillRect(0,0,W,H); if(v) try{ x.drawImage(v,0,0,W,H); }catch(e){} x.fillStyle='rgba(0,0,0,.3)'; x.fillRect(0,0,W,H); return [c,x]; };
+  const [c1,x1]=mk(); const h=buildHeat(t.samples.filter(s=>s.valid),W,H); x1.drawImage(h.c,0,0,W,H); renderAOIs(x1,r,aoisOf(t),t,1.3,null);
+  const [c2,x2]=mk(); renderPath(x2,r,t.fix,1.4);
+  if(v) v.remove();
+  return { heat:c1.toDataURL('image/jpeg',.85), path:c2.toDataURL('image/jpeg',.85), ar };
+}
+
+const loadImg = src => new Promise(res=>{ if(!src) return res(null); const im=new Image(); im.onload=()=>res(im); im.onerror=()=>res(null); im.src=src; });
+async function testGazeImages(r){
+  const g=r.gazeRec, W=720, H=Math.round(720*g.H/g.W);
+  const pts=g.s.map(a=>({ t:a[0], u:a[1]/g.W, v:a[2]/g.H }));
+  const c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  x.fillStyle='#0b0f14'; x.fillRect(0,0,W,H);
+  const im=await loadImg((S.testMedia[r.id]||{}).snap);
+  if(im){ x.globalAlpha=.45; x.drawImage(im,0,0,W,H); x.globalAlpha=1; }
+  x.drawImage(buildHeat(pts,W,H).c,0,0,W,H);
+  const t=document.createElement('canvas'); t.width=1000; t.height=360;
+  drawTrace(t.getContext('2d'), null, pts, g.dur, null, false);
+  return { heat:c.toDataURL('image/jpeg',.85), trace:t.toDataURL('image/png') };
+}
+$('btnPdf').addEventListener('click', makePDF);
+async function makePDF(){
+  if(!window.jspdf){ alert('No se pudo cargar el generador de PDF. Revisá la conexión a internet y recargá la página.'); return; }
+  const ath=$('resAthlete').value, tests=S.tests.filter(t=>t.athlete===ath), trials=S.trials.filter(t=>t.athlete===ath);
+  if(!tests.length && !trials.length){ alert(`No hay resultados para «${ath}».`); return; }
+  const btn=$('btnPdf'); btn.disabled=true; btn.textContent='Generando…';
+  try {
+    const { jsPDF }=window.jspdf, doc=new jsPDF({unit:'mm',format:'a4'});
+    const PW=210, M=14, CW=PW-2*M; let y=0;
+    const ensure=h=>{ if(y+h>280){ doc.addPage(); y=18; } };
+    const font=(sz,st='normal',col=[36,41,47])=>{ doc.setFont('helvetica',st); doc.setFontSize(sz); doc.setTextColor(...col); };
+    const h2=t=>{ ensure(16); y+=4; font(14,'bold',[31,111,235]); doc.text(clean(t),M,y); y+=2; doc.setDrawColor(208,215,222); doc.line(M,y,PW-M,y); y+=7; };
+    const h3=t=>{ ensure(12); font(11.5,'bold'); doc.text(clean(t),M,y); y+=5.5; };
+    const para=(t,sz=9.5,col=[87,96,106])=>{ font(sz,'normal',col); const ls=doc.splitTextToSize(clean(t),CW); ensure(ls.length*4.6); doc.text(ls,M,y); y+=ls.length*4.6+1; };
+    const table=(head, rows, widths)=>{
+      const rh=7; ensure(rh*2);
+      doc.setFillColor(243,245,247); doc.rect(M,y-5,CW,rh,'F'); font(8.5,'bold',[87,96,106]);
+      let x=M; head.forEach((h,i)=>{ doc.text(clean(h),x+1.5,y); x+=widths[i]; }); y+=rh;
+      rows.forEach(row=>{
+        ensure(rh); x=M;
+        row.forEach((c,i)=>{ const col=Array.isArray(c)?c[1]:[36,41,47], val=Array.isArray(c)?c[0]:c; font(9,'normal',col);
+          doc.text(doc.splitTextToSize(clean(val),widths[i]-3)[0]||'',x+1.5,y); x+=widths[i]; });
+        doc.setDrawColor(234,238,242); doc.line(M,y+2.2,PW-M,y+2.2); y+=rh;
+      });
+      y+=2;
+    };
+
+    // portada / encabezado
+    doc.setFillColor(13,17,23); doc.rect(0,0,PW,32,'F');
+    font(22,'bold',[255,255,255]); doc.text('Trak',M,15); doc.setTextColor(46,160,67); doc.text('Eye',M+doc.getTextWidth('Trak'),15);
+    font(11,'normal',[201,209,217]); doc.text('Informe de evaluación visual',M,24);
+    doc.text(clean(new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'})),PW-M,24,{align:'right'});
+    y=44; font(18,'bold'); doc.text(clean(ath),M,y); y+=7;
+    const info=[];
+    if(tests.length) info.push(`${tests.length} test${tests.length>1?'s':''} visuales registrados`);
+    if(trials.length) info.push(`${trials.length} análisis de video`);
+    if(S.calErr!=null) info.push(`calibración de mirada: error medio ~${Math.round(S.calErr)} px`);
+    para(info.join(' · '),10);
+
+    // tests
+    if(tests.length){
+      h2('Resumen de tests visuales');
+      const keys=Object.keys(TESTS).filter(k=>tests.some(t=>t.key===k));
+      table(['Test','Área','Fecha','Nivel','Resultado','Vs. anterior'],
+        keys.map(k=>{ const r=tests.filter(t=>t.key===k).at(-1), p=prevResult(r), c=compare(r,p);
+          const vs = !c ? '-' : c.same ? 'Igual' : `${c.better?'Mejor':'Peor'} (${plain(p.main.value,p.main.unit,p.main.dec)})`;
+          return [TESTS[k].name, TESTS[k].area, new Date(r.date).toLocaleDateString('es-AR'), TESTS[k].noLevels?'-':String(r.level), plain(r.main.value,r.main.unit,r.main.dec),
+            [vs, !c||c.same?[87,96,106]:c.better?[26,127,55]:[207,34,46]]]; }),
+        [42,44,22,13,26,35]);
+
+      h2('Detalle por test');
+      for(const k of keys){
+        const hist=tests.filter(t=>t.key===k), r=hist.at(-1), p=prevResult(r);
+        ensure(40);
+        h3(`${TESTS[k].name} - ${TESTS[k].area}`);
+        para(`${TESTS[k].desc} ${TESTS[k].noLevels?'':`Nivel ${r.level} · `}${new Date(r.date).toLocaleString('es-AR')}${r.gaze?' · con seguimiento ocular':''}.`,9);
+        table(['Métrica','Actual','Anterior (mismo nivel)'],
+          r.metrics.map(([l,v,u,d],i)=>[l, plain(v,u,d), p&&p.metrics[i] ? plain(p.metrics[i][1],p.metrics[i][2],p.metrics[i][3]) : '-']),
+          [80,45,57]);
+        if(r.gazeRec){
+          const g=r.gazeRec;
+          ensure(70); font(9.5,'bold',[87,96,106]); doc.text('Movimiento ocular durante el test',M,y); y+=8;
+          table(['Métrica de mirada','Valor','Métrica de mirada','Valor'],
+            [0,2,4,6].map(i=>[g.m[i][0], plain(g.m[i][1],g.m[i][2],g.m[i][3]), g.m[i+1][0], plain(g.m[i+1][1],g.m[i+1][2],g.m[i+1][3])]),
+            [58,33,58,33]);
+          if(g.s.length){
+            const imgs=await testGazeImages(r);
+            const iw=CW*0.42, ih=iw*g.H/g.W, tw=CW-iw-4, th=tw*0.36;
+            ensure(Math.max(ih,th)+10);
+            doc.addImage(imgs.heat,'JPEG',M,y,iw,ih);
+            doc.addImage(imgs.trace,'PNG',M+iw+4,y,tw,th);
+            font(7.5,'normal',[87,96,106]);
+            doc.text('Mapa de calor de la mirada sobre la pantalla del test',M,y+ih+4);
+            doc.text(doc.splitTextToSize('Posición horizontal (azul) y vertical (naranja) de la mirada a lo largo del test. Mesetas = fijaciones; saltos = movimientos sacádicos.',tw),M+iw+4,y+th+4);
+            y+=Math.max(ih,th+8)+8;
+          }
+        }
+        const sdp=r.detail&&r.detail.schulte;
+        if(sdp && sdp.dwell && r.gazeRec){
+          const g=r.gazeRec, iw=CW*0.48, ih=iw*g.H/g.W;
+          y+=4; ensure(ih+14); font(9.5,'bold',[87,96,106]); doc.text('Mapa de calor por casillero (permanencia de la mirada)',M,y); y+=3;
+          doc.addImage(schulteCellImg(r),'JPEG',M,y,iw,ih);
+          const pn=sdp.perNum||[], slow=[...pn].sort((a,b)=>b[1]-a[1]).slice(0,5), seen=pn.filter(p=>p[3]).map(p=>p[0]);
+          let ty=y+4; const tx=M+iw+6, tw=CW-iw-6; font(9,'bold'); doc.text('Números más lentos',tx,ty); ty+=5; font(9,'normal',[36,41,47]);
+          slow.forEach(p=>{ doc.text(clean(`N° ${p[0]}: ${(p[1]/1000).toFixed(2)} s · ${p[2]} fijaciones${p[3]?' · visto sin reconocer':''}`),tx,ty); ty+=4.6; });
+          ty+=3; font(9,'bold'); doc.text('Vistos sin reconocer',tx,ty); ty+=5; font(9,'normal',[36,41,47]);
+          doc.text(doc.splitTextToSize(clean(seen.length?seen.map(x=>'N° '+x).join(', '):'Ninguno'),tw),tx,ty);
+          y+=ih+8;
+        }
+        if(k==='indice' && r.detail && r.detail.scores){
+          ensure(76); const c=document.createElement('canvas'); c.width=640; c.height=480; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,640,480);
+          drawRadar4(x, 320, 245, 160, r.detail.scores, false, 20);
+          doc.addImage(c.toDataURL('image/png'),'PNG',M+CW/2-45,y,90,67.5); y+=72;
+        }
+        if(k==='periph' && r.detail && r.detail.byDir){
+          ensure(72); font(9,'bold',[87,96,106]); doc.text('Detección por dirección',M,y); y+=2;
+          doc.addImage(radarImg(r.detail.byDir),'PNG',M+CW/2-35,y,70,70); y+=74;
+        }
+        const same=hist.filter(t=>t.level===r.level).slice(-8);
+        if(same.length>=2 && typeof r.main.value==='number'){
+          ensure(52); font(9,'bold',[87,96,106]); doc.text(clean(`Evolución: ${r.main.label} (nivel ${r.level})`),M,y); y+=2;
+          doc.addImage(barChartImg(same.map(t=>t.main.value), same.map(t=>dShort(t.date)), r.main.unit, r.main.dec),'PNG',M,y,CW,CW*300/900); y+=CW*300/900+4;
+        }
+        y+=2;
+      }
+    }
+
+    // video
+    if(trials.length){
+      h2('Análisis de mirada sobre video');
+      for(const t of trials){
+        const img=await trialImages(t);
+        const iw=(CW-4)/2, ih=iw/img.ar;
+        ensure(ih+40);
+        h3(t.clip);
+        const bits=[`${t.fix.length} fijaciones`, t.fix.length?`duración media ${Math.round(mean(t.fix.map(f=>f.dur)))} ms`:null,
+          t.duration?`${(t.fix.length/t.duration).toFixed(2)} fijaciones/s`:null, `${Math.round(validPct(t))}% muestras válidas`,
+          t.question?`respuesta: ${t.decision||'sin respuesta'}${t.rt?` (${t.rt.toFixed(2)} s)`:''}`:null].filter(Boolean);
+        para(bits.join(' · '),9);
+        doc.addImage(img.heat,'JPEG',M,y,iw,ih); doc.addImage(img.path,'JPEG',M+iw+4,y,iw,ih); y+=ih+4;
+        font(8,'normal',[87,96,106]); doc.text('Mapa de calor de la mirada',M,y); doc.text('Recorrido de fijaciones (orden y duración)',M+iw+4,y); y+=6;
+        const list=aoisOf(t);
+        const peers=peersOf(t).filter(p=>p!==t);
+        if(list.length && peers.length){
+          table(['Zona','Permanencia','Prom. grupo','1a fijación','Prom. grupo','Fijaciones'], list.map(a=>{
+            const s=aoiStats(t,a), g=peers.map(p=>aoiStats(p,a)), gt=g.map(x=>x.ttff).filter(v=>v!=null);
+            return [a.name, fmt(s.dwell,0)+'%', fmt(mean(g.map(x=>x.dwell)),0)+'%', s.ttff!=null?s.ttff.toFixed(2)+' s':'-', gt.length?mean(gt).toFixed(2)+' s':'-', String(s.nfix)]; }), [46,28,28,28,28,24]);
+          para(`Promedio del grupo: ${peers.length} análisis de otros jugadores sobre el mismo video (${[...new Set(peers.map(p=>p.athlete))].join(', ')}).`,8);
+        } else if(list.length) table(['Zona','Permanencia','1a fijación','Fijaciones'], list.map(a=>{ const s=aoiStats(t,a); return [a.name, fmt(s.dwell,0)+'%', s.ttff!=null?s.ttff.toFixed(2)+' s':'-', String(s.nfix)]; }), [70,38,38,36]);
+        y+=3;
+      }
+    }
+
+    h2('Notas metodológicas');
+    para('La mirada se estima con la cámara frontal del dispositivo mediante reconocimiento facial y del iris, sin hardware específico. Su precisión es menor que la de un eye tracker profesional, por lo que los resultados deben interpretarse de forma comparativa: el mismo jugador a lo largo del tiempo o distintos jugadores evaluados con el mismo protocolo, nivel y condiciones (distancia, luz y posición del dispositivo).');
+    para('Los tests sin seguimiento ocular miden respuestas táctiles; los tiempos incluyen la latencia de la pantalla táctil del dispositivo, que es constante y no afecta la comparación entre evaluaciones con el mismo equipo.');
+
+    const n=doc.getNumberOfPages();
+    for(let i=1;i<=n;i++){ doc.setPage(i); font(8,'normal',[140,149,159]); doc.text(clean(`TrakEye · ${ath}`),M,290); doc.text(`Página ${i} de ${n}`,PW-M,290,{align:'right'}); }
+    doc.save(`TrakEye_${ath.replace(/[^\w\-]+/g,'_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+    $('pdfStatus').innerHTML='<span class="ok">Informe generado.</span>';
+  } catch(e){ console.error(e); alert('No se pudo generar el PDF: '+e.message); }
+  btn.disabled=false; btn.textContent='Generar informe PDF';
+}
+
+refreshButtons();
+window.TrakEye = { S, VT }; // acceso para diagnóstico desde la consola
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
