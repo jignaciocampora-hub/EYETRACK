@@ -159,6 +159,11 @@ th{color:var(--mut);font-weight:500}
       <div class="status" id="pdfStatus">El informe incluye los tests del jugador con su evolución y los análisis de video de esta sesión.</div>
     </section>
     <section class="card">
+      <h2>Ranking del plantel</h2>
+      <select id="rankSel" style="max-width:420px"></select>
+      <div id="rankTbl" class="tblwrap status" style="margin-top:8px">Sin datos</div>
+    </section>
+    <section class="card">
       <h2>Tests visuales</h2>
       <div id="testHist" class="tblwrap status">Sin resultados</div>
       <div class="row" style="margin-top:12px">
@@ -893,7 +898,7 @@ async function intro(title, lines){
   const cx=VT.W/2, maxW=Math.min(VT.W*0.82, 640);
   const all=lines.flatMap(l=>wrap(l,maxW,19));
   const total=46+all.length*30; let y=VT.H/2-total/2;
-  clr(); txt(title,cx,y,32,C.fg,'center',700); y+=56;
+  clr(); if(VT.stepLabel) txt(VT.stepLabel,cx,y-48,14,C.acc,'center',800); txt(title,cx,y,32,C.fg,'center',700); y+=56;
   all.forEach(l=>{ txt(l,cx,y,19,C.mut,'center',500); y+=30; });
   txt('Tocá la pantalla para empezar', cx, VT.H-50, 18, C.acc, 'center', 700);
   await vtWait(null,true);
@@ -993,11 +998,12 @@ async function tPeriph(lv){
 }
 
 /* ---------- 4. Tabla de Schulte ---------- */
-async function tSchulte(lv){
+async function tSchulte(lv, o={}){
   const n=lv===1?4:lv===2?5:6, total=n*n, reshuffle=lv===4;
   const live=$('optLivePanel').checked;
   const lines=[`Tocá los números del 1 al ${total} en orden ascendente, lo más rápido posible.`,'Tratá de mirar el centro de la tabla y encontrar los números con la visión periférica.'];
   if(reshuffle) lines.push('Nivel 4: los números cambian de lugar después de cada acierto.');
+  if(o.limit) lines.push(`Tenés ${Math.round(o.limit/1000)} segundos; si no llegás, cuenta hasta dónde llegaste.`);
   await intro(`Tabla de Schulte ${n}x${n}`,lines);
   await countdown();
   let nums=shuffle([...Array(total)].map((_,i)=>i+1));
@@ -1044,6 +1050,7 @@ async function tSchulte(lv){
   const draw=now=>{
     clr();
     if(!side) txt(st.next<=total?`Buscá el ${st.next}`:'¡Terminado!', areaW/2, oy-26, 18, C.mut);
+    if(o.limit) hud(`${Math.max(0,Math.ceil((o.limit-(now-tStart))/1000))} s`);
     for(let k=0;k<total;k++){
       const c=k%n, r=Math.floor(k/n), x=ox+c*cell, y=oy+r*cell;
       const fl=st.flash && st.flash.idx===k && now<st.flash.until, found=!reshuffle && st.foundIdx.has(k);
@@ -1055,7 +1062,9 @@ async function tSchulte(lv){
   let running=true;
   (async()=>{ while(running){ const now=await frame(); updGaze(now); draw(now); } })().catch(()=>{});
   while(st.next<=total){
-    const tap=await vtWait(null,true);
+    const rem = o.limit ? o.limit-(performance.now()-tStart) : null;
+    if(rem!=null && rem<=0) break;
+    const tap=await vtWait(rem,true); if(!tap) break;
     const idx=cellOf(tap.x,tap.y); if(idx<0) continue;
     if(nums[idx]===st.next){
       splits.push(tap.t-last); last=tap.t; st.found.push([st.next, Math.round(tap.t-VT.t0), idx]); st.foundIdx.add(idx); st.next++;
@@ -1064,9 +1073,9 @@ async function tSchulte(lv){
     } else { st.errors++; st.flash={idx,color:'#8b2b2b',until:performance.now()+250}; }
   }
   await vtWait(500); running=false; await frame();
-  const T=(last-tStart)/1000, slowI=splits.indexOf(Math.max(...splits));
-  const metrics=[['Tiempo total',T,'s',1],['Errores',st.errors,'',0],['Tiempo medio por número',mean(splits)/1000,'s',2],
-    ['Número más lento',Math.max(...splits)/1000,'s',2],['Cuál fue el más lento',`N° ${slowI+1}`,'',0]];
+  const complete=st.next>total, T=complete?(last-tStart)/1000:(o.limit/1000), mxS=splits.length?Math.max(...splits):null, slowI=splits.indexOf(mxS);
+  const metrics=[['Tiempo total',T,'s',1],['Encontrados',`${st.next-1} / ${total}`,'',0],['Errores',st.errors,'',0],['Tiempo medio por número',splits.length?mean(splits)/1000:null,'s',2],
+    ['Número más lento',mxS!=null?mxS/1000:null,'s',2],['Cuál fue el más lento',slowI>=0?`N° ${slowI+1}`:'—','',0]];
   const sd={ n, reshuffle, layouts: reshuffle ? st.layouts : [st.layouts[0]], geo:{ox:Math.round(ox),oy:Math.round(oy),size:Math.round(size)}, t0:Math.round(tStart-VT.t0), found:st.found };
   if(VT.useGaze){
     const A=schulteAnalysis(sd, VT.gaze.filter(s=>s.valid && s.t>=tStart && s.t<=last+200).map(s=>({t:s.t-VT.t0,x:s.x,y:s.y})));
@@ -1148,11 +1157,12 @@ function schulteCellImg(r){
 }
 
 /* ---------- 5. Seguimiento múltiple de objetos (MOT) ---------- */
-async function tMOT(lv){
-  const cfg=[{n:6,k:2,sp:.18},{n:8,k:3,sp:.24},{n:10,k:4,sp:.30}][lv-1], rounds=6, trackMs=6000;
-  await intro('Seguimiento múltiple (MOT)',[`Se van a marcar ${cfg.k} pelotas en amarillo: memorizalas.`,'Después todas se ven iguales y se mueven: seguilas con la vista.','Cuando se detengan, tocá las que estaban marcadas.','La velocidad se adapta a tu rendimiento.']);
+async function tMOT(lv, o={}){
+  const cfg=o.cfg||[{n:6,k:2,sp:.18},{n:8,k:3,sp:.24},{n:10,k:4,sp:.30}][lv-1], rounds=o.rounds||6, trackMs=o.trackMs||6000;
+  await intro('Seguimiento múltiple (MOT)',[`Se van a marcar ${cfg.k} pelotas en amarillo: memorizalas.`,'Después todas se ven iguales y se mueven: seguilas con la vista.','Cuando se detengan, tocá las que estaban marcadas.',o.speeds?`${rounds} rondas, cada una más rápida.`:'La velocidad se adapta a tu rendimiento.']);
   const m=Math.min(VT.W,VT.H), R=m*0.032, TOP=48; let speed=cfg.sp; const scores=[];
   for(let round=0; round<rounds; round++){
+    if(o.speeds) speed=o.speeds[round];
     const balls=[]; let guard=0;
     while(balls.length<cfg.n && guard++<5000){
       const b={ x:rand(R*2,VT.W-R*2), y:rand(TOP+R*2,VT.H-R*2) };
@@ -1194,7 +1204,7 @@ async function tMOT(lv){
   const acc=100*mean(scores);
   return mkRes('mot',lv,{label:'Precisión',value:acc,unit:'%',dec:0,better:'high'},[
     ['Precisión',acc,'%',0],['Rondas perfectas',`${scores.filter(s=>s===1).length} / ${rounds}`,'',0],
-    ['Velocidad alcanzada',speed/cfg.sp,'x',2],['Pelotas / objetivos',`${cfg.n} / ${cfg.k}`,'',0]]);
+    ['Velocidad alcanzada',speed/cfg.sp,'x',2],['Pelotas / objetivos',`${cfg.n} / ${cfg.k}`,'',0]],{scores});
 }
 
 /* ---------- 6. Coordinación ojo-mano ---------- */
@@ -1302,13 +1312,217 @@ async function tEyeDom(){
   return mkRes('eyedom',1,{label:'Ojo dominante',value:dom,unit:'',dec:0,better:null},metrics,{votes,method,hand});
 }
 
+/* ---------- 9. Memoria visual: "¿cuál es la nueva?" ---------- */
+let AC=null;
+function beep(f=880,ms=120){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const o=AC.createOscillator(), g=AC.createGain(); o.frequency.value=f; o.connect(g); g.connect(AC.destination); g.gain.setValueAtTime(.18,AC.currentTime); g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+ms/1000); o.start(); o.stop(AC.currentTime+ms/1000); }catch(e){} }
+const LCOL=['#a371f7','#3fb950','#58a6ff','#f0883e','#ffd33d','#f85149','#db61a2','#39d0d8'];
+async function tMemVis(lv, o={}){
+  const nL=o.lights||[15,20,25][lv-1], limit=o.limit||60000, nPos=nL+6;
+  await intro('Memoria visual',['Se enciende una luz (con su sonido): tocala.','Después se encienden las que ya viste más una nueva. Tocá SOLO la nueva.',`Son ${nL} luces en ${Math.round(limit/1000)} segundos.`]);
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); AC.resume&&AC.resume(); }catch(e){}
+  await countdown();
+  const cx=VT.W/2, cy=VT.H/2+16, rx=Math.min(VT.W*0.42, 460), ry=Math.min(VT.H*0.36, 300), sz=Math.max(28,Math.min(52, Math.min(rx,ry)*0.17));
+  const pos=[]; let guard=0;
+  while(pos.length<nPos && guard++<20000){ const a=Math.random()*2*Math.PI, r=Math.sqrt(Math.random()); const p={x:cx+Math.cos(a)*r*(rx-sz), y:cy+Math.sin(a)*r*(ry-sz)}; if(pos.every(q=>Math.hypot(q.x-p.x,q.y-p.y)>sz*1.55)) pos.push(p); }
+  const order=shuffle([...pos.keys()]).slice(0,nL), t0=performance.now();
+  let correct=0, wrong=0, round=0; const rts=[];
+  const draw=(lit,flash)=>{
+    clr(); hud(`${Math.max(0,Math.ceil((limit-(performance.now()-t0))/1000))} s`);
+    txt('¿Cuál es la nueva?', cx, 46, 24, C.fg, 'center', 700);
+    X.fillStyle='#121821'; X.beginPath(); X.ellipse(cx,cy,rx,ry,0,0,Math.PI*2); X.fill();
+    pos.forEach((p,i)=>{ const L=lit.get(i); X.fillStyle= flash&&flash.i===i ? flash.c : L || '#2a313c'; if(L){ X.shadowColor=L; X.shadowBlur=18; } X.fillRect(p.x-sz/2,p.y-sz/2,sz,sz); X.shadowBlur=0; X.strokeStyle='#3a424d'; X.lineWidth=2; X.strokeRect(p.x-sz/2,p.y-sz/2,sz,sz); });
+  };
+  for(round=0; round<nL; round++){
+    if(performance.now()-t0>=limit) break;
+    const lit=new Map(); order.slice(0,round+1).forEach(i=>lit.set(i, LCOL[Math.floor(Math.random()*LCOL.length)]));
+    const nw=order[round];
+    draw(lit); beep(660+round*25); const ts=performance.now();
+    let tap=null;
+    while(true){
+      const rem=limit-(performance.now()-t0); if(rem<=0){ tap=null; break; }
+      tap=await vtWait(Math.min(rem,1000),true);
+      if(!tap){ draw(lit); continue; }
+      const hit=pos.findIndex(p=>Math.abs(tap.x-p.x)<=sz*0.75 && Math.abs(tap.y-p.y)<=sz*0.75);
+      if(hit>=0 && lit.has(hit)){ tap.i=hit; break; }
+    }
+    if(!tap) break;
+    if(tap.i===nw){ correct++; rts.push(tap.t-ts); draw(lit,{i:nw,c:'#2ea043'}); }
+    else { wrong++; draw(lit,{i:tap.i,c:'#8b2b2b'}); X.strokeStyle='#fff'; X.lineWidth=4; X.strokeRect(pos[nw].x-sz/2-4,pos[nw].y-sz/2-4,sz+8,sz+8); }
+    await vtWait(tap.i===nw?250:700);
+  }
+  clr(); txt('¡Terminado!',VT.W/2,VT.H/2,36,C.go,'center',700); await vtWait(600);
+  const pct=100*correct/nL;
+  return mkRes('memvis',lv,{label:'Aciertos',value:pct,unit:'%',dec:0,better:'high'},[
+    ['Aciertos',pct,'%',0],['Luces correctas',`${correct} / ${nL}`,'',0],['Errores',wrong,'',0],['Alcanzó a ver',`${Math.min(round,nL)} / ${nL}`,'',0],['Tiempo de respuesta',median(rts),'ms',0]],
+    {correct, total:nL, wrong});
+}
+
+/* ---------- 10. Velocidad mental: pares de números ---------- */
+async function tVelMental(lv, o={}){
+  const nP=o.pairs||[8,10,12][lv-1], limit=o.limit||60000, cols=6, rows=Math.ceil((nP*2+12)/cols), cells=cols*rows;
+  await intro('Velocidad mental',['En la grilla hay números repetidos de a dos.',`Encontrá los ${nP} pares tocando los dos números iguales.`,`Tenés ${Math.round(limit/1000)} segundos. Los colores no importan: solo el número.`]);
+  await countdown();
+  const pool=shuffle([...Array(90)].map((_,i)=>i+10)), pairsN=pool.slice(0,nP), singles=pool.slice(nP, nP+(cells-nP*2));
+  const vals=shuffle([...pairsN,...pairsN,...singles]), cols8=['#f0883e','#da3633','#1f6feb','#a371f7','#2ea043','#d29922','#e3b341','#bf4b8a'];
+  const colr=vals.map(()=>cols8[Math.floor(Math.random()*cols8.length)]);
+  const gone=new Set(); let sel=-1, found=0, wrong=0, flash=null;
+  const top=96, size=Math.min(VT.W*0.92/cols, (VT.H-top-24)/rows), gw=size*cols, ox=(VT.W-gw)/2, oy=top;
+  const t0=performance.now(); let tEnd=null;
+  const draw=()=>{
+    clr(); hud(`${Math.max(0,Math.ceil((limit-(performance.now()-t0))/1000))} s`);
+    txt('Pares encontrados', VT.W/2, 34, 18, C.mut, 'center', 600); txt(`${found} / ${nP}`, VT.W/2, 66, 30, C.y, 'center', 800);
+    for(let k=0;k<cells;k++){ const c=k%cols, r=Math.floor(k/cols), x=ox+c*size, y=oy+r*size;
+      X.fillStyle = gone.has(k) ? '#1b2129' : flash&&flash.ks.includes(k) ? flash.c : colr[k]; X.fillRect(x+3,y+3,size-6,size-6);
+      if(k===sel){ X.strokeStyle='#fff'; X.lineWidth=4; X.strokeRect(x+4,y+4,size-8,size-8); }
+      txt(String(vals[k]), x+size/2, y+size/2, size*0.36, gone.has(k)?'#3a424d':'#fff', 'center', 800); }
+  };
+  while(found<nP){
+    const rem=limit-(performance.now()-t0); if(rem<=0) break;
+    draw(); const tap=await vtWait(Math.min(rem,1000),true); if(!tap) continue;
+    const c=Math.floor((tap.x-ox)/size), r=Math.floor((tap.y-oy)/size); if(c<0||r<0||c>=cols||r>=rows) continue;
+    const k=r*cols+c; if(gone.has(k)) continue;
+    if(sel<0){ sel=k; continue; } if(sel===k){ sel=-1; continue; }
+    if(vals[sel]===vals[k]){ gone.add(sel); gone.add(k); found++; sel=-1; if(found===nP) tEnd=tap.t; }
+    else { wrong++; flash={ks:[sel,k],c:'#8b2b2b'}; sel=-1; draw(); await vtWait(300); flash=null; }
+  }
+  draw(); await vtWait(500);
+  const T=((tEnd||performance.now())-t0)/1000;
+  return mkRes('velmental',lv,{label:'Pares encontrados',value:found,unit:'',dec:0,better:'high'},[
+    ['Pares encontrados',`${found} / ${nP}`,'',0],['Tiempo',found===nP?T:null,'s',1],['Errores',wrong,'',0],['Pares por minuto',found/(Math.min(T,limit/1000)/60),'',1]],
+    {found, total:nP, T, complete:found===nP, limit});
+}
+
+/* ---------- Evaluación rápida e Índice TrakEye ---------- */
+const DOMS=[
+  { k:'escaneo', name:'Escaneo visual', txt:['La búsqueda visual es lenta: entrenala con Schulte.','Buena búsqueda; se demora con muchos estímulos.','Encontrás lo que buscás sin perder tiempo.'] },
+  { k:'atencion', name:'Atención múltiple', txt:['Se pierden objetivos con el movimiento: entrená MOT.','Seguís varias cosas; con velocidad se pierde alguna.','Seguís varias cosas a la vez sin perder ninguna.'] },
+  { k:'memoria', name:'Memoria visual', txt:['La memoria visual se satura rápido.','Buena memoria visual; se nubla cuando hay muchas.','Gran memoria visual: retenés mucha información.'] },
+  { k:'velocidad', name:'Velocidad mental', txt:['Velocidad de procesamiento para mejorar.','Buena velocidad, con margen cuando aprieta el reloj.','Procesás muy rápido bajo presión de tiempo.'] },
+];
+const band = v => v>=80?2:v>=55?1:0;
+function indexPhrase(v){ return v>=85?'Rendimiento de élite':v>=70?'Muy bueno, con cosas para pulir':v>=55?'Bueno, con margen de mejora':v>=40?'En desarrollo':'Mucho para ganar entrenando'; }
+function scoreOf(key, r){
+  if(key==='escaneo'){ const sd=r.detail.schulte, f=sd.found.length, tot=sd.n*sd.n; if(f===tot){ const T=r.main.value; return clamp(Math.round(100-(T-18)*2),5,100); } return Math.round(20*f/tot); }
+  if(key==='atencion'){ const sc=r.detail.scores, w=[1,1.25,1.5]; let a=0,b=0; sc.forEach((s,i)=>{ a+=s*(w[i]||1.5); b+=(w[i]||1.5); }); return Math.round(100*a/b); }
+  if(key==='memoria'){ return Math.round(100*r.detail.correct/r.detail.total); }
+  if(key==='velocidad'){ const d=r.detail; return clamp(Math.round(d.found*(70/d.total) + (d.complete?30*clamp((d.limit/1000-d.T)/(d.limit/1000-10),0,1):0)),0,100); }
+}
+function rankInfo(key, r){
+  const latest=new Map(); S.tests.filter(t=>t.key===key && t.level===r.level && !!t.quick===!!r.quick && typeof t.main.value==='number').forEach(t=>latest.set(t.athlete,t));
+  const arr=[...latest.values()].sort((a,b)=>r.main.better==='low'?a.main.value-b.main.value:b.main.value-a.main.value);
+  return { pos:arr.findIndex(t=>t.athlete===r.athlete)+1, n:arr.length, arr };
+}
+async function runQuickEval(){
+  VT.useGaze=false; VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
+  $('vt').classList.add('on'); vtSetup(); VT.t0=performance.now();
+  const steps=[
+    { d:'escaneo', key:'schulte', lv:2, o:{limit:60000} },
+    { d:'atencion', key:'mot', lv:2, o:{cfg:{n:8,k:4,sp:.2}, rounds:3, speeds:[.2,.27,.34], trackMs:5000} },
+    { d:'memoria', key:'memvis', lv:2, o:{lights:20, limit:60000} },
+    { d:'velocidad', key:'velmental', lv:2, o:{pairs:10, limit:45000} } ];
+  try {
+    await intro('Evaluación rápida',['4 desafíos cortos, unos 5 minutos en total:','Escaneo visual · Atención múltiple · Memoria visual · Velocidad mental.','Al final obtenés el Índice TrakEye (0–100) y el perfil por área.']);
+    const scores={}, ids=[];
+    for(const [i,st] of steps.entries()){
+      VT.stepLabel=`DESAFÍO ${i+1} / ${steps.length}`;
+      const r=await TESTS[st.key].fn(st.lv, st.o); r.quick=true; S.tests.push(r); ids.push(r.id);
+      scores[st.d]=scoreOf(st.d, r);
+    }
+    VT.stepLabel=null;
+    const idx=Math.round(mean(DOMS.map(d=>scores[d.k])));
+    const res=mkRes('indice',1,{label:'Índice TrakEye',value:idx,unit:'',dec:0,better:'high'},
+      [['Índice TrakEye',idx,'',0], ...DOMS.map(d=>[d.name,scores[d.k],'',0]), ['Lectura',indexPhrase(idx),'',0]], {scores, ids});
+    res.quick=true;
+    const prev=prevResult(res); S.tests.push(res); saveTests();
+    await showIndexSummary(res, prev);
+  } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en la evaluación: '+e.message); } saveTests(); }
+  VT.stepLabel=null; S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
+  renderTestCards();
+}
+function drawRadar4(x, cx, cy, R, sc, dark, fontPx){
+  x.strokeStyle=dark?'#30363d':'#d0d7de'; x.lineWidth=Math.max(1,R/120);
+  const ang=i=>-Math.PI/2+i*Math.PI/2;
+  [25,50,75,100].forEach(p=>{ x.beginPath(); for(let i=0;i<=4;i++){ const a=ang(i%4); const px=cx+Math.cos(a)*R*p/100, py=cy+Math.sin(a)*R*p/100; i?x.lineTo(px,py):x.moveTo(px,py); } x.stroke(); });
+  for(let i=0;i<4;i++){ x.beginPath(); x.moveTo(cx,cy); x.lineTo(cx+Math.cos(ang(i))*R,cy+Math.sin(ang(i))*R); x.stroke(); }
+  x.beginPath(); DOMS.forEach((d,i)=>{ const v=(sc[d.k]||0)/100, px=cx+Math.cos(ang(i))*R*v, py=cy+Math.sin(ang(i))*R*v; i?x.lineTo(px,py):x.moveTo(px,py); }); x.closePath();
+  x.fillStyle='rgba(163,113,247,.3)'; x.fill(); x.strokeStyle='#a371f7'; x.lineWidth=Math.max(2,R/50); x.stroke();
+  DOMS.forEach((d,i)=>{ const v=(sc[d.k]||0)/100; x.fillStyle='#ffd33d'; x.beginPath(); x.arc(cx+Math.cos(ang(i))*R*v, cy+Math.sin(ang(i))*R*v, Math.max(3,R/30),0,7); x.fill(); });
+  x.font=`600 ${fontPx}px ${FONT}`; x.fillStyle=dark?'#8b949e':'#57606a'; x.textBaseline='middle';
+  [['center',0,-1],['left',1,0],['center',0,1],['right',-1,0]].forEach(([al,dx,dy],i)=>{ x.textAlign=al; x.fillText(DOMS[i].name, cx+dx*(R+10), cy+dy*(R+fontPx)); });
+}
+function drawIndexRing(x, cx, cy, R, v, fontPx){
+  x.lineWidth=R*0.16; x.strokeStyle='#30363d'; x.beginPath(); x.arc(cx,cy,R,0,Math.PI*2); x.stroke();
+  x.strokeStyle='#ffd33d'; x.lineCap='round'; x.beginPath(); x.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+Math.PI*2*v/100); x.stroke(); x.lineCap='butt';
+  x.fillStyle='#e6edf3'; x.font=`800 ${fontPx}px ${FONT}`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(String(v),cx,cy+fontPx*0.05);
+}
+function shareCanvas(r){
+  const W=1080, H=1350, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d'), sc=r.detail.scores;
+  const gr=x.createLinearGradient(0,0,W,H); gr.addColorStop(0,'#0d1117'); gr.addColorStop(1,'#1a1030'); x.fillStyle=gr; x.fillRect(0,0,W,H);
+  x.textAlign='left'; x.textBaseline='alphabetic'; x.font=`800 54px ${FONT}`; x.fillStyle='#e6edf3'; x.fillText('Trak',70,110); const tw=x.measureText('Trak').width; x.fillStyle='#2ea043'; x.fillText('Eye',70+tw,110);
+  x.font=`600 26px ${FONT}`; x.fillStyle='#8b949e'; x.fillText('ÍNDICE TRAKEYE · EVALUACIÓN VISUAL Y COGNITIVA',70,155);
+  x.font=`800 46px ${FONT}`; x.fillStyle='#e6edf3'; x.fillText(r.athlete,70,240);
+  x.font=`500 26px ${FONT}`; x.fillStyle='#8b949e'; x.fillText(new Date(r.date).toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'}),70,282);
+  drawIndexRing(x, 250, 470, 140, r.main.value, 120);
+  x.textAlign='left'; x.font=`800 40px ${FONT}`; x.fillStyle='#ffd33d'; wrapLines(x, indexPhrase(r.main.value), 470, 440, 540, 48);
+  let y=700;
+  DOMS.forEach(d=>{ const v=sc[d.k];
+    x.font=`700 32px ${FONT}`; x.fillStyle='#e6edf3'; x.textAlign='left'; x.fillText(d.name,70,y); x.textAlign='right'; x.fillStyle='#ffd33d'; x.fillText(String(v),W-70,y);
+    x.fillStyle='#30363d'; x.fillRect(70,y+20,W-140,14); const g2=x.createLinearGradient(70,0,W-70,0); g2.addColorStop(0,'#1f6feb'); g2.addColorStop(1,'#a371f7'); x.fillStyle=g2; x.fillRect(70,y+20,(W-140)*v/100,14);
+    x.textAlign='left'; x.font=`500 24px ${FONT}`; x.fillStyle='#8b949e'; x.fillText(d.txt[band(v)],70,y+68); y+=140; });
+  x.textAlign='center'; x.font=`600 24px ${FONT}`; x.fillStyle='#6e7681'; x.fillText('Muestra de rendimiento · no reemplaza una evaluación profesional', W/2, H-50);
+  return c;
+}
+function wrapLines(x, text, X0, Y0, maxW, lh){ const words=text.split(' '); let line='', y=Y0; for(const w of words){ const t=line?line+' '+w:w; if(x.measureText(t).width>maxW && line){ x.fillText(line,X0,y); line=w; y+=lh; } else line=t; } if(line) x.fillText(line,X0,y); }
+async function shareResult(r, blob){
+  const name=`TrakEye_${r.athlete.replace(/[^\w\-]+/g,'_')}_${r.date.slice(0,10)}.png`;
+  try {
+    blob = blob || await new Promise(res=>shareCanvas(r).toBlob(res,'image/png'));
+    const file=new File([blob], name, {type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file], title:'Mi Índice TrakEye', text:`Índice TrakEye: ${r.main.value}`}); return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  } catch(e){ if(e && e.name==='AbortError') return; try{ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); }catch(_){} }
+}
+async function showIndexSummary(r, prev){
+  const sc=r.detail.scores, W=VT.W, H=VT.H, wide=W>H*1.1;
+  let blob=null; shareCanvas(r).toBlob(b=>{ blob=b; },'image/png');
+  const rk=rankInfo('indice', r), c=compare(r,prev);
+  clr();
+  const colW = wide ? W/2 : W, cx1 = wide ? W*0.25 : W/2;
+  let y = wide ? Math.max(50, H*0.1) : 44;
+  txt('ÍNDICE TRAKEYE', cx1, y, 14, C.mut, 'center', 700); y+=20;
+  const R = wide ? Math.min(90, H*0.12) : Math.min(70, H*0.08);
+  drawIndexRing(X, cx1, y+R+8, R, r.main.value, R*0.8); y+=2*R+40;
+  txt(indexPhrase(r.main.value), cx1, y, 22, C.y, 'center', 800); y+=26;
+  if(c && !c.same) txt(`${c.better?'Mejor':'Peor'} que la vez anterior (${prev.main.value})`, cx1, y, 15, c.better?C.go:C.bad, 'center', 600), y+=22;
+  if(rk.n>1) txt(`Puesto ${rk.pos}° de ${rk.n} jugadores evaluados`, cx1, y, 15, C.go, 'center', 700), y+=22;
+  const rR = wide ? Math.min(110, (H-y-110)/2.6) : Math.min(80,(H*0.22)/2);
+  if(rR>40){ drawRadar4(X, cx1, y+rR+26, rR, sc, true, 13); y+=2*rR+60; }
+  let x0 = wide ? W/2+10 : 24, bw = (wide ? W/2 : W) - (wide?50:48), by = wide ? Math.max(60,H*0.14) : y;
+  const lh = wide ? Math.min(110,(H-by-110)/4) : Math.min(78,(H-by-100)/4);
+  DOMS.forEach(d=>{ const v=sc[d.k];
+    txt(d.name, x0, by, 17, C.fg, 'left', 700); txt(String(v), x0+bw, by, 22, C.y, 'right', 800);
+    X.fillStyle='#30363d'; X.fillRect(x0, by+14, bw, 8); X.fillStyle='#a371f7'; X.fillRect(x0, by+14, bw*v/100, 8);
+    txt(d.txt[band(v)], x0, by+38, 14, C.mut, 'left', 500); by+=lh; });
+  const bW=Math.min(240,(W-60)/2), bH=54, yb=H-bH-24, b1={x:W/2-bW-8,y:yb,w:bW,h:bH}, b2={x:W/2+8,y:yb,w:bW,h:bH};
+  const btn=(b,l,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect?X.roundRect(b.x,b.y,b.w,b.h,12):X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(l,b.x+b.w/2,b.y+b.h/2,17,'#fff','center',700); };
+  btn(b1,'Compartir resultado','#8957e5'); btn(b2,'Cerrar','#30363d');
+  const inB=(t,b)=>t.x>=b.x&&t.x<=b.x+b.w&&t.y>=b.y-8&&t.y<=b.y+b.h+8;
+  while(true){
+    const t=await new Promise((res,rej)=>{ VT.tapCb=p=>{ VT.tapCb=null; VT.cancel=null; if(inB(p,b1)) shareResult(r, blob); res(p); }; VT.cancel=()=>{ VT.tapCb=null; rej(ABORT); }; });
+    if(inB(t,b2)) return;
+  }
+}
+
 const TESTS = {
+  indice:  { name:'Índice TrakEye', area:'Evaluación rápida', fn:null, hidden:true, noLevels:true, desc:'Evaluación de 5 minutos con 4 desafíos: escaneo visual, atención múltiple, memoria visual y velocidad mental. Puntaje de 0 a 100 por área y global.' },
   react:   { name:'Tiempo de reacción', area:'Velocidad de reacción', fn:tReact, desc:'Respuesta lo más rápida posible a un estímulo visual central.' },
   gonogo:  { name:'Go / No-Go', area:'Concentración e inhibición', fn:tGoNoGo, desc:'Responder al verde e inhibir la respuesta al rojo. Mide atención sostenida y control de impulsos.' },
   periph:  { name:'Visión periférica', area:'Campo visual periférico', fn:tPeriph, desc:'Detectar destellos en 8 direcciones y 3 distancias (parafoveal, periferia media y lejana) sin mover los ojos del centro.' },
   schulte: { name:'Tabla de Schulte', area:'Atención y búsqueda visual', fn:tSchulte, levels:4, levelNames:['4x4','5x5','6x6','6x6 mezcla'], desc:'Encontrar los números en orden ascendente lo más rápido posible. Con mirada: mapa de calor por casillero, fijaciones por número, números vistos sin reconocer y estrategia de búsqueda.' },
   mot:     { name:'Seguimiento múltiple (MOT)', area:'Atención dividida', fn:tMOT, desc:'Seguir varias pelotas en movimiento a la vez, como compañeros y rivales en el campo.' },
   eyehand: { name:'Coordinación ojo-mano', area:'Coordinación visomotora', fn:tEyeHand, desc:'Tocar objetivos que aparecen en lugares aleatorios, lo más rápido y preciso posible.' },
+  memvis:  { name:'Memoria visual', area:'Memoria de trabajo visual', fn:tMemVis, levelNames:['15 luces','20 luces','25 luces'], desc:'Se encienden luces que ya viste más una nueva: tocá solo la nueva. Mide cuánta información visual retenés.' },
+  velmental: { name:'Velocidad mental', area:'Velocidad de procesamiento', fn:tVelMental, levelNames:['8 pares','10 pares','12 pares'], desc:'Encontrá los pares de números repetidos en una grilla de colores, contra reloj.' },
   eyedom:  { name:'Ojo dominante', area:'Dominancia ocular', fn:tEyeDom, noLevels:true, noGaze:true, desc:'Determina el ojo dominante con los métodos de Miles o Porta (3 repeticiones) y detecta dominancia cruzada ojo-mano. El evaluador marca las respuestas.' },
   pursuit: { name:'Seguimiento suave', area:'Motilidad ocular', fn:tPursuit, needsGaze:true, desc:'Seguir un objetivo en movimiento solo con los ojos. La cámara mide cuánto te mantenés sobre él.' },
 };
@@ -1382,7 +1596,7 @@ function buildGazeRec(dur){
   return { W, H, dur:Math.round(dur), calErr:S.calErr, s,
     fix:fx.map(f=>({ x:Math.round(f.x), y:Math.round(f.y), u:+f.u.toFixed(4), v:+f.v.toFixed(4), t:Math.round(f.vt*1000), dur:Math.round(f.dur) })), m };
 }
-const prevResult = r => S.tests.filter(o=>o.athlete===r.athlete && o.key===r.key && o.level===r.level && o.date<r.date).at(-1);
+const prevResult = r => S.tests.filter(o=>o.athlete===r.athlete && o.key===r.key && o.level===r.level && !!o.quick===!!r.quick && o.date<r.date).at(-1);
 function compare(r, p){
   if(!p || typeof r.main.value!=='number' || typeof p.main.value!=='number') return null;
   const d=r.main.value-p.main.value, better = r.main.better==='low' ? d<0 : d>0;
@@ -1570,7 +1784,13 @@ function renderTvMetrics(){
 }
 function renderTestCards(){
   const a=curAthlete();
-  $('testGrid').innerHTML=Object.entries(TESTS).map(([k,T])=>{
+  const lastIdx=S.tests.filter(r=>r.key==='indice' && r.athlete===a).at(-1);
+  $('testGrid').innerHTML=`<div class="tcard" style="grid-column:1/-1;background:linear-gradient(135deg,#1f2a4a,#2a1747);border-color:#3d2b6b">
+      <div class="tarea" style="color:#d2a8ff">Evaluación rápida · 5 minutos</div><h3 style="font-size:22px">Índice TrakEye</h3>
+      <p class="sub">4 desafíos seguidos (escaneo visual, atención múltiple, memoria visual y velocidad mental). Resultado de 0 a 100 por área y global, con radar, ranking del plantel e imagen para compartir.</p>
+      <div class="sub">${lastIdx?`Último índice: <b style="color:#ffd33d;font-size:18px">${lastIdx.main.value}</b> · ${new Date(lastIdx.date).toLocaleDateString('es-AR')}`:'Todavía sin índice para este jugador'}</div>
+      <div class="row"><button class="go" id="btnQuick" style="background:#8957e5">Empezar evaluación rápida</button>${lastIdx?`<button class="sec" id="btnShareIdx">Compartir último resultado</button>`:''}</div></div>`+
+    Object.entries(TESTS).filter(([k,T])=>!T.hidden).map(([k,T])=>{
     const last=S.tests.filter(r=>r.key===k && r.athlete===a).at(-1), lv=S.levels[k]||1, lvTxt=T.noLevels?'':` · nivel ${last?last.level:''}`;
     const blocked=T.needsGaze && !S.model;
     return `<div class="tcard"><div class="tarea">${esc(T.area)}</div><h3>${esc(T.name)}</h3><p class="sub">${esc(T.desc)}</p>
@@ -1581,6 +1801,8 @@ function renderTestCards(){
   }).join('');
   $('testGrid').querySelectorAll('.lv button').forEach(b=>b.addEventListener('click',()=>{ S.levels[b.parentElement.dataset.k]=+b.dataset.n; renderTestCards(); }));
   $('testGrid').querySelectorAll('.tstart').forEach(b=>b.addEventListener('click',()=>runVisionTest(b.dataset.k)));
+  $('btnQuick').addEventListener('click', runQuickEval);
+  if($('btnShareIdx')) $('btnShareIdx').addEventListener('click',()=>shareResult(lastIdx));
 }
 
 /* ================= resultados ================= */
@@ -1612,11 +1834,25 @@ function renderResults(){
       <div class="sub">${t.fix.length} fijaciones · ${Math.round(validPct(t))}% muestras válidas${t.decision?` · ${esc(t.decision)} (${t.rt.toFixed(2)} s)`:''} · tocá para analizar</div></div>`).join('');
     el.querySelectorAll('.trial').forEach(d=>d.addEventListener('click',()=>openAnalysis(+d.dataset.i)));
   }
+  renderRanking();
   $('btnClearTests').disabled = !tests.length;
   $('btnTestsCsv').disabled = !S.tests.length;
   refreshButtons();
 }
 $('resAthlete').addEventListener('change', renderResults);
+function renderRanking(){
+  const sel=$('rankSel'), prev=sel.value, combos=new Map();
+  S.tests.forEach(t=>{ if(typeof t.main.value!=='number') return; const id=`${t.key}|${t.level}|${t.quick?1:0}`; if(!combos.has(id)) combos.set(id, t); });
+  const label=t=>t.key==='indice'?'Índice TrakEye (evaluación rápida)':`${TESTS[t.key]?TESTS[t.key].name:t.name}${TESTS[t.key]&&TESTS[t.key].noLevels?'':' · '+(TESTS[t.key]&&TESTS[t.key].levelNames?TESTS[t.key].levelNames[t.level-1]:'nivel '+t.level)}${t.quick&&t.key!=='indice'?' (eval. rápida)':''} — ${t.main.label}`;
+  const ids=[...combos.keys()].sort((a,b)=>a.startsWith('indice')?-1:b.startsWith('indice')?1:0);
+  sel.innerHTML=ids.map(id=>`<option value="${esc(id)}">${esc(label(combos.get(id)))}</option>`).join('');
+  if(ids.includes(prev)) sel.value=prev;
+  const el=$('rankTbl'); if(!ids.length){ el.className='tblwrap status'; el.textContent='Sin datos todavía'; return; }
+  const ref=combos.get(sel.value), rk=rankInfo(ref.key, ref), me=$('resAthlete').value;
+  el.className='tblwrap';
+  el.innerHTML='<table><tr><th>#</th><th>Jugador</th><th>Resultado</th><th>Fecha</th></tr>'+rk.arr.map((t,i)=>`<tr${t.athlete===me?' style="color:#ffd33d"':''}><td><b>${i+1}°</b></td><td>${esc(t.athlete)}</td><td><b>${fmtV(t.main.value,t.main.unit,t.main.dec)}</b></td><td>${new Date(t.date).toLocaleDateString('es-AR')}</td></tr>`).join('')+'</table><div class="status">Último resultado de cada jugador en esta prueba.</div>';
+}
+$('rankSel').addEventListener('change', renderRanking);
 $('btnClearTests').addEventListener('click', ()=>{
   const a=$('resAthlete').value;
   if(!confirm(`¿Borrar todo el historial de tests de «${a}»? No se puede deshacer.`)) return;
@@ -1814,6 +2050,11 @@ async function makePDF(){
           ty+=3; font(9,'bold'); doc.text('Vistos sin reconocer',tx,ty); ty+=5; font(9,'normal',[36,41,47]);
           doc.text(doc.splitTextToSize(clean(seen.length?seen.map(x=>'N° '+x).join(', '):'Ninguno'),tw),tx,ty);
           y+=ih+8;
+        }
+        if(k==='indice' && r.detail && r.detail.scores){
+          ensure(76); const c=document.createElement('canvas'); c.width=640; c.height=480; const x=c.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,640,480);
+          drawRadar4(x, 320, 245, 160, r.detail.scores, false, 20);
+          doc.addImage(c.toDataURL('image/png'),'PNG',M+CW/2-45,y,90,67.5); y+=72;
         }
         if(k==='periph' && r.detail && r.detail.byDir){
           ensure(72); font(9,'bold',[87,96,106]); doc.text('Detección por dirección',M,y); y+=2;
