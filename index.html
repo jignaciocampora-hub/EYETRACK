@@ -207,6 +207,7 @@ th{color:var(--mut);font-weight:500}
     <button class="sec" id="tvBack">← Volver</button>
     <div><div id="tvTitle" style="font-weight:700"></div><div class="sub" id="tvSub"></div></div>
   </header>
+  <div class="seg row" id="tvChips" style="display:none;margin-bottom:10px"></div>
   <div class="vwrap" id="tvWrap" style="aspect-ratio:16/10;max-height:62vh;margin:0 auto"><video id="tvVideo" playsinline muted preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:fill"></video><canvas id="tvCanvas" style="position:absolute;inset:0;width:100%;height:100%"></canvas></div>
   <div class="row" style="margin:10px 0"><button id="tvPlay">▶︎</button><input type="range" id="tvSeek" min="0" max="1000" value="0"><span class="sub" id="tvTime" style="min-width:90px;text-align:right"></span></div>
   <div class="seg row" id="tvModes">
@@ -1413,19 +1414,22 @@ function rankInfo(key, r){
   return { pos:arr.findIndex(t=>t.athlete===r.athlete)+1, n:arr.length, arr };
 }
 async function runQuickEval(){
-  VT.useGaze=false; VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
+  VT.useGaze = !!S.model && $('optVtGaze').checked;
+  if(VT.useGaze && sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes de la evaluación.'); return; }
+  VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
   $('vt').classList.add('on'); vtSetup(); VT.t0=performance.now();
+  let view=null;
   const steps=[
     { d:'escaneo', key:'schulte', lv:2, o:{limit:60000} },
     { d:'atencion', key:'mot', lv:2, o:{cfg:{n:8,k:4,sp:.2}, rounds:3, speeds:[.2,.27,.34], trackMs:5000} },
     { d:'memoria', key:'memvis', lv:2, o:{lights:20, limit:60000} },
     { d:'velocidad', key:'velmental', lv:2, o:{pairs:10, limit:45000} } ];
   try {
-    await intro('Evaluación rápida',['4 desafíos cortos, unos 5 minutos en total:','Escaneo visual · Atención múltiple · Memoria visual · Velocidad mental.','Al final obtenés el Índice TrakEye (0–100) y el perfil por área.']);
+    await intro('Evaluación rápida',['4 desafíos cortos, unos 5 minutos en total:','Escaneo visual · Atención múltiple · Memoria visual · Velocidad mental.','Al final obtenés el Índice TrakEye (0–100) y el perfil por área.', VT.useGaze?'Se registra hacia dónde mirás en cada desafío.':'(Sin registro de mirada: activá cámara y calibración para verla.)']);
     const scores={}, ids=[];
     for(const [i,st] of steps.entries()){
       VT.stepLabel=`DESAFÍO ${i+1} / ${steps.length}`;
-      const r=await TESTS[st.key].fn(st.lv, st.o); r.quick=true; S.tests.push(r); ids.push(r.id);
+      const r=await runWithGaze(()=>TESTS[st.key].fn(st.lv, st.o)); r.quick=true; r.dom=st.d; S.tests.push(r); ids.push(r.id);
       scores[st.d]=scoreOf(st.d, r);
     }
     VT.stepLabel=null;
@@ -1434,10 +1438,11 @@ async function runQuickEval(){
       [['Índice TrakEye',idx,'',0], ...DOMS.map(d=>[d.name,scores[d.k],'',0]), ['Lectura',indexPhrase(idx),'',0]], {scores, ids});
     res.quick=true;
     const prev=prevResult(res); S.tests.push(res); saveTests();
-    await showIndexSummary(res, prev);
+    if(await showIndexSummary(res, prev)==='view') view=firstGazeChild(res);
   } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en la evaluación: '+e.message); } saveTests(); }
   VT.stepLabel=null; S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
   renderTestCards();
+  if(view) openTestView(view);
 }
 function drawRadar4(x, cx, cy, R, sc, dark, fontPx){
   x.strokeStyle=dark?'#30363d':'#d0d7de'; x.lineWidth=Math.max(1,R/120);
@@ -1482,6 +1487,9 @@ async function shareResult(r, blob){
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
   } catch(e){ if(e && e.name==='AbortError') return; try{ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); a.remove(); }catch(_){} }
 }
+const childrenOf = idx => (idx.detail&&idx.detail.ids||[]).map(id=>S.tests.find(t=>t.id===id)).filter(Boolean);
+const firstGazeChild = idx => childrenOf(idx).find(t=>t.gazeRec);
+const parentIndexOf = r => S.tests.find(t=>t.key==='indice' && t.detail && t.detail.ids && t.detail.ids.includes(r.id));
 async function showIndexSummary(r, prev){
   const sc=r.detail.scores, W=VT.W, H=VT.H, wide=W>H*1.1;
   let blob=null; shareCanvas(r).toBlob(b=>{ blob=b; },'image/png');
@@ -1503,13 +1511,15 @@ async function showIndexSummary(r, prev){
     txt(d.name, x0, by, 17, C.fg, 'left', 700); txt(String(v), x0+bw, by, 22, C.y, 'right', 800);
     X.fillStyle='#30363d'; X.fillRect(x0, by+14, bw, 8); X.fillStyle='#a371f7'; X.fillRect(x0, by+14, bw*v/100, 8);
     txt(d.txt[band(v)], x0, by+38, 14, C.mut, 'left', 500); by+=lh; });
-  const bW=Math.min(240,(W-60)/2), bH=54, yb=H-bH-24, b1={x:W/2-bW-8,y:yb,w:bW,h:bH}, b2={x:W/2+8,y:yb,w:bW,h:bH};
-  const btn=(b,l,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect?X.roundRect(b.x,b.y,b.w,b.h,12):X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(l,b.x+b.w/2,b.y+b.h/2,17,'#fff','center',700); };
-  btn(b1,'Compartir resultado','#8957e5'); btn(b2,'Cerrar','#30363d');
+  const hasGaze=!!firstGazeChild(r), nb=hasGaze?3:2, bW=Math.min(230,(W-40-(nb-1)*12)/nb), bH=54, yb=H-bH-24, x0b=W/2-(nb*bW+(nb-1)*12)/2;
+  const B=[...Array(nb)].map((_,i)=>({x:x0b+i*(bW+12),y:yb,w:bW,h:bH}));
+  const btn=(b,l,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect?X.roundRect(b.x,b.y,b.w,b.h,12):X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(l,b.x+b.w/2,b.y+b.h/2,16,'#fff','center',700); };
+  btn(B[0],'Compartir resultado','#8957e5'); if(hasGaze) btn(B[1],'Ver dónde miró','#1f6feb'); btn(B[nb-1],'Cerrar','#30363d');
   const inB=(t,b)=>t.x>=b.x&&t.x<=b.x+b.w&&t.y>=b.y-8&&t.y<=b.y+b.h+8;
   while(true){
-    const t=await new Promise((res,rej)=>{ VT.tapCb=p=>{ VT.tapCb=null; VT.cancel=null; if(inB(p,b1)) shareResult(r, blob); res(p); }; VT.cancel=()=>{ VT.tapCb=null; rej(ABORT); }; });
-    if(inB(t,b2)) return;
+    const t=await new Promise((res,rej)=>{ VT.tapCb=p=>{ VT.tapCb=null; VT.cancel=null; if(inB(p,B[0])) shareResult(r, blob); res(p); }; VT.cancel=()=>{ VT.tapCb=null; rej(ABORT); }; });
+    if(hasGaze && inB(t,B[1])) return 'view';
+    if(inB(t,B[nb-1])) return 'close';
   }
 }
 
@@ -1603,27 +1613,21 @@ function compare(r, p){
   return { d, better, same: Math.abs(d)<1e-9 };
 }
 
-async function runVisionTest(key){
-  const T=TESTS[key];
-  if(T.needsGaze && !S.model){ alert('Este test necesita la cámara activa y la calibración de mirada.'); return; }
-  VT.useGaze = !!S.model && !T.noGaze && (T.needsGaze || $('optVtGaze').checked);
-  if(VT.useGaze && sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes del test.'); return; }
-  VT.abort=false; VT.gaze=[]; VT.lastGaze=null; VT.tapCb=null; VT.cancel=null; VT.snaps=[];
-  $('vt').classList.add('on'); vtSetup(); newFilter();
+/* corre un test registrando la mirada (re-centrado, grabación/capturas y trayectoria) */
+async function runWithGaze(run){
+  VT.gaze=[]; VT.lastGaze=null; VT.snaps=[]; newFilter();
   let R=null, snapTimer=null;
   S.offset={x:0,y:0};
-  if(VT.useGaze){ // re-centrado rápido: corrige la deriva desde la calibración
-    clr(); cross(VT.W/2,VT.H/2,18); txt('Mirá la cruz',VT.W/2,VT.H/2+50,18,C.mut,'center',500);
-    const arr=[]; S.collect={from:performance.now()+350, arr}; await sleep(1300); S.collect=null;
-    const ps=arr.filter(isOpen).map(f=>predictWith(S.model,f));
-    if(ps.length>=8){ let dx=median(ps.map(p=>p.x))-VT.W/2, dy=median(ps.map(p=>p.y))-VT.H/2; const m=Math.hypot(dx,dy), lim=180; if(m>lim){ dx*=lim/m; dy*=lim/m; } S.offset={x:dx,y:dy}; }
-  }
-  VT.t0=performance.now();
-  if(VT.useGaze){ S.mode='vt'; R=startRec(); VT.t0=performance.now(); snapTimer=setInterval(takeSnap,250); }
-  const lv=S.levels[key]||1;
-  let view=null;
   try {
-    const res=await T.fn(lv);
+    if(VT.useGaze){ // re-centrado rápido: corrige la deriva desde la calibración
+      clr(); cross(VT.W/2,VT.H/2,18); txt('Mirá la cruz',VT.W/2,VT.H/2+50,18,C.mut,'center',500);
+      const arr=[]; S.collect={from:performance.now()+350, arr}; await vtWait(1300); S.collect=null;
+      const ps=arr.filter(isOpen).map(f=>predictWith(S.model,f));
+      if(ps.length>=8){ let dx=median(ps.map(p=>p.x))-VT.W/2, dy=median(ps.map(p=>p.y))-VT.H/2; const m=Math.hypot(dx,dy), lim=180; if(m>lim){ dx*=lim/m; dy*=lim/m; } S.offset={x:dx,y:dy}; }
+      S.mode='vt'; R=startRec(); snapTimer=setInterval(takeSnap,250);
+    }
+    VT.t0=performance.now();
+    const res=await run();
     const dur=performance.now()-VT.t0;
     S.mode='idle'; clearInterval(snapTimer);
     if(VT.useGaze){
@@ -1633,14 +1637,29 @@ async function runVisionTest(key){
       const snap=VT.snaps.length ? VT.snaps.reduce((b,s)=>Math.abs(s.t-dur/2)<Math.abs(b.t-dur/2)?s:b).url : null;
       S.testMedia[res.id]={ videoUrl:url, snap, frames:VT.snaps.slice() };
       const ids=Object.keys(S.testMedia).filter(k=>S.testMedia[k].frames && S.testMedia[k].frames.length);
-      ids.slice(0,Math.max(0,ids.length-10)).forEach(k=>{ S.testMedia[k].frames=[]; }); // memoria: cuadros solo de los últimos 10 tests
+      ids.slice(0,Math.max(0,ids.length-12)).forEach(k=>{ S.testMedia[k].frames=[]; }); // memoria: cuadros solo de los últimos tests
     }
+    return res;
+  } finally {
+    S.collect=null; clearInterval(snapTimer); if(R) stopRec(R);
+    S.offset={x:0,y:0}; S.mode='idle';
+  }
+}
+async function runVisionTest(key){
+  const T=TESTS[key];
+  if(T.needsGaze && !S.model){ alert('Este test necesita la cámara activa y la calibración de mirada.'); return; }
+  VT.useGaze = !!S.model && !T.noGaze && (T.needsGaze || $('optVtGaze').checked);
+  if(VT.useGaze && sizeChanged()){ alert('La orientación cambió desde la calibración. Recalibrá antes del test.'); return; }
+  VT.abort=false; VT.tapCb=null; VT.cancel=null;
+  $('vt').classList.add('on'); vtSetup();
+  const lv=S.levels[key]||1;
+  let view=null;
+  try {
+    const res=await runWithGaze(()=>T.fn(lv));
     const prev=prevResult(res);
     S.tests.push(res); saveTests();
     if(await showSummary(res, prev)==='view') view=res;
   } catch(e){ if(e!==ABORT){ console.error(e); alert('Error en el test: '+e.message); } }
-  clearInterval(snapTimer); if(R) stopRec(R);
-  S.offset={x:0,y:0};
   S.mode='idle'; VT.abort=false; $('vt').classList.remove('on');
   renderTestCards();
   if(view) openTestView(view);
@@ -1686,6 +1705,13 @@ function openTestView(r){
     : TV.media.videoUrl ? '' : (TV.frames&&TV.frames.length) ? '' : 'No hay imagen de la pantalla para este test (es de una sesión anterior). Se muestra solo la mirada.';
   $('tvNoVideo').innerHTML=note; $('tvNoVideo').style.display = note ? 'block' : 'none';
   $('tvTitle').textContent=`${r.athlete} · ${r.name}`;
+  const par=parentIndexOf(r), chips=$('tvChips');
+  if(par){
+    const kids=childrenOf(par);
+    chips.innerHTML=`<span class="sub" style="margin-right:4px">Índice ${par.main.value} ·</span>`+kids.map(k=>{ const d=DOMS.find(x=>x.k===k.dom); return `<button data-id="${esc(k.id)}" class="${k===r?'on':''}" ${k.gazeRec?'':'disabled'}>${esc(d?d.name:k.name)}</button>`; }).join('');
+    chips.style.display='flex';
+    chips.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ const k=S.tests.find(t=>t.id===b.dataset.id); if(k&&k!==TV.r){ const from=TV.from; tvv.pause(); openTestView(k); TV.from=from; } }));
+  } else chips.style.display='none';
   $('tvSub').textContent=`${new Date(r.date).toLocaleString('es-AR')} · nivel ${r.level}`+(g.trimmed?' · trayectoria eliminada por falta de espacio':'');
   const hasCells=!!(r.key==='schulte' && r.detail && r.detail.schulte && r.detail.schulte.dwell);
   $('tvCellsBtn').style.display=hasCells?'':'none';
@@ -1822,9 +1848,9 @@ function renderResults(){
     tests.map(t=>{ const c=compare(t, prevResult(t));
       return `<tr><td>${new Date(t.date).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td><td>${esc(t.name)}</td><td>${TESTS[t.key]&&TESTS[t.key].noLevels?'—':t.level}</td>
       <td><b>${fmtV(t.main.value,t.main.unit,t.main.dec)}</b></td><td class="${c?(c.same?'':c.better?'ok':'badc'):''}">${c?(c.same?'=':c.better?'Mejor':'Peor'):'—'}</td>
-      <td>${t.gazeRec?`<button class="sec tvopen" data-id="${esc(t.id)}" style="padding:5px 10px;font-size:13px">Ver</button>`:'—'}</td></tr>`; }).join('')+'</table>';
+      <td>${(t.key==='indice'?firstGazeChild(t):t.gazeRec)?`<button class="sec tvopen" data-id="${esc(t.id)}" style="padding:5px 10px;font-size:13px">Ver</button>`:'—'}</td></tr>`; }).join('')+'</table>';
   $('testHist').className = tests.length ? 'tblwrap' : 'tblwrap status';
-  $('testHist').querySelectorAll('.tvopen').forEach(b=>b.addEventListener('click',()=>{ const r=S.tests.find(t=>t.id===b.dataset.id); if(r) openTestView(r); }));
+  $('testHist').querySelectorAll('.tvopen').forEach(b=>b.addEventListener('click',()=>{ let r=S.tests.find(t=>t.id===b.dataset.id); if(r && r.key==='indice') r=firstGazeChild(r); if(r) openTestView(r); }));
   const trials=S.trials.map((t,i)=>({t,i})).filter(o=>o.t.athlete===a);
   const el=$('trialList');
   if(!trials.length){ el.className='status'; el.textContent='Todavía no hay análisis de video para este jugador'; }
