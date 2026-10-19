@@ -144,6 +144,7 @@ th{color:var(--mut);font-weight:500}
       <h2>Tests y entrenamiento visual</h2>
       <div class="sub">Cada test sirve para evaluar (nivel fijo, comparable en el tiempo) o para entrenar (subí de nivel). Los resultados se guardan en este dispositivo por jugador.</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" id="optVtGaze" disabled> Registrar el movimiento de los ojos durante los tests (requiere cámara y calibración)</label>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" id="optLivePanel"> Panel del evaluador en vivo en la Tabla de Schulte (pantalla horizontal: tiempo, objetivo, "buscando hace" y mapa de mirada por casillero)</label>
       <div class="status">Con esta opción, cada test se graba junto con la mirada. Al terminar podés ver la repetición con el recorrido de los ojos, el mapa de calor y el gráfico del movimiento ocular.</div>
     </section>
     <div id="testGrid"></div>
@@ -207,6 +208,7 @@ th{color:var(--mut);font-weight:500}
     <button data-m="replay" class="on">Repetición</button>
     <button data-m="heat">Mapa de calor</button>
     <button data-m="path">Recorrido</button>
+    <button data-m="cells" id="tvCellsBtn" style="display:none">Por casillero</button>
   </div>
   <div class="status" id="tvNoVideo" style="display:none">No hay grabación de la pantalla para este test (es de una sesión anterior o el navegador no permite grabar). Se muestra solo la mirada.</div>
   <div class="card">
@@ -342,7 +344,7 @@ function extract(res){
     open:Math.min(e1.open,e2.open), oR:e1.open, oL:e2.open
   };
 }
-const isOpen = f => !S.openMed || f.open > S.openMed*0.6;
+const isOpen = f => !S.openMed || f.open > S.openMed*0.45;
 
 function drawPreview(res, f){
   const pv=$('preview'), c=pv.getContext('2d'), w=pv.width, h=pv.height, st=$('camStatus');
@@ -992,37 +994,157 @@ async function tPeriph(lv){
 
 /* ---------- 4. Tabla de Schulte ---------- */
 async function tSchulte(lv){
-  const n=lv===1?4:5, total=n*n, reshuffle=lv===3;
-  const lines=[`Tocá los números del 1 al ${total} en orden, lo más rápido posible.`,'Tratá de mirar el centro de la tabla y encontrar los números con la visión periférica.'];
-  if(reshuffle) lines.push('Nivel 3: los números cambian de lugar después de cada acierto.');
-  await intro('Tabla de Schulte',lines);
+  const n=lv===1?4:lv===2?5:6, total=n*n, reshuffle=lv===4;
+  const live=$('optLivePanel').checked;
+  const lines=[`Tocá los números del 1 al ${total} en orden ascendente, lo más rápido posible.`,'Tratá de mirar el centro de la tabla y encontrar los números con la visión periférica.'];
+  if(reshuffle) lines.push('Nivel 4: los números cambian de lugar después de cada acierto.');
+  await intro(`Tabla de Schulte ${n}x${n}`,lines);
   await countdown();
   let nums=shuffle([...Array(total)].map((_,i)=>i+1));
-  const size=Math.min(VT.W, VT.H-80)*0.92, cell=size/n, ox=(VT.W-size)/2, oy=(VT.H-size)/2+20;
-  let next=1, errors=0;
-  const draw=hl=>{
-    clr(); txt(`Buscá el ${next}`, VT.W/2, oy-26, 18, C.mut);
+  const side = live && VT.W>VT.H*1.15, pw = side ? Math.min(360, VT.W*0.32) : 0;
+  const areaW=VT.W-pw, size=Math.min(areaW-24, VT.H-90)*0.94, cell=size/n, ox=(areaW-size)/2, oy=(VT.H-size)/2+22;
+  const st={ next:1, errors:0, flash:null, found:[], foundIdx:new Set(), layouts:[nums.slice()] };
+  const cellOf=(x,y)=>{ const c=Math.floor((x-ox)/cell), r=Math.floor((y-oy)/cell); return (c<0||r<0||c>=n||r>=n)?-1:r*n+c; };
+  const tStart=performance.now(); let last=tStart; const splits=[];
+  // mirada en vivo por casillero
+  const dwell=new Float64Array(total); let gi=0, lastG=null, fixCount=0, lastFixCalc=0;
+  while(gi<VT.gaze.length && VT.gaze[gi].t<tStart) gi++;
+  const updGaze=now=>{
+    for(;gi<VT.gaze.length;gi++){ const s=VT.gaze[gi]; if(!s.valid){ lastG=null; continue; } const k=cellOf(s.x,s.y); if(lastG && k>=0) dwell[k]+=Math.min(100,s.t-lastG.t); lastG=s; }
+    if(side && VT.useGaze && now-lastFixCalc>500){ lastFixCalc=now; fixCount=fixations(VT.gaze.filter(s=>s.valid&&s.t>=tStart).map(s=>({t:s.t,x:s.x,y:s.y,u:0,v:0,vt:0,valid:true}))).length; }
+  };
+  const drawPanel=now=>{
+    const x0=areaW+8, w=pw-24; let y=oy+6;
+    X.fillStyle='#11161d'; X.fillRect(areaW, 0, pw, VT.H);
+    txt(`TABLA DE SCHULTE ${n}x${n}`, x0, y, 17, C.fg, 'left', 800); y+=22;
+    txt(VT.useGaze?'Panel del evaluador · análisis de mirada':'Panel del evaluador', x0, y, 12, C.mut, 'left', 500); y+=30;
+    const done=st.next>total, buscando=(now-last)/1000;
+    const rows=[['TIEMPO',`${((now-tStart)/1000).toFixed(1)} s`,C.fg],['OBJETIVO',done?'—':String(st.next),C.fg],['ENCONTRADOS',`${st.next-1} / ${total}`,C.fg],['ERRORES',String(st.errors),st.errors?C.bad:C.fg]];
+    if(VT.useGaze) rows.push(['FIJACIONES',String(fixCount),C.fg]);
+    rows.push(['BUSCANDO HACE',`${buscando.toFixed(1)} s`, buscando>3?C.bad:buscando>1.5?C.warn:C.y]);
+    rows.forEach(([l,v,c])=>{ txt(l,x0,y,12,C.mut,'left',600); txt(v,x0+w*0.55,y,17,c,'left',700); y+=27; });
+    y+=8;
+    if(!VT.useGaze){ txt('Activá cámara y calibración',x0,y+10,12,C.mut,'left',500); txt('para ver el mapa de mirada',x0,y+28,12,C.mut,'left',500); return; }
+    txt('Mapa de calor (permanencia) + recorrido 2,5 s', x0, y, 11, C.mut, 'left', 500); y+=12;
+    const ms=Math.min(w, VT.H-y-14), mc=ms/n; let mx=0; for(const v of dwell) if(v>mx) mx=v;
+    const lay=nums;
     for(let k=0;k<total;k++){
-      const c=k%n, r=Math.floor(k/n), x=ox+c*cell, y=oy+r*cell;
-      X.fillStyle = hl&&hl.idx===k ? hl.color : '#161b22'; X.fillRect(x+3,y+3,cell-6,cell-6);
-      const done=!reshuffle && nums[k]<next;
-      txt(String(nums[k]), x+cell/2, y+cell/2, cell*0.38, done?'#3a424d':C.fg, 'center', 700);
+      const c=k%n, r=Math.floor(k/n), v=mx?dwell[k]/mx:0, [R,G,B]=infernoColor(v);
+      X.fillStyle=`rgb(${R},${G},${B})`; X.fillRect(x0+c*mc+1,y+r*mc+1,mc-2,mc-2);
+      txt(String(lay[k]), x0+c*mc+mc/2, y+r*mc+mc/2, mc*0.32, v>0.6?'#111':'#fff', 'center', 700);
+      if(!reshuffle && lay[k]===st.next){ X.strokeStyle=C.y; X.lineWidth=2; X.strokeRect(x0+c*mc+2,y+r*mc+2,mc-4,mc-4); }
+    }
+    const recent=VT.gaze.filter(s=>s.valid && s.t>=now-2500);
+    if(recent.length>1){
+      const P2=s=>[x0+clamp((s.x-ox)/size,0,1)*ms, y+clamp((s.y-oy)/size,0,1)*ms];
+      X.strokeStyle='rgba(255,211,61,.9)'; X.lineWidth=2; X.beginPath(); recent.forEach((s,i)=>{ const [a,b]=P2(s); i?X.lineTo(a,b):X.moveTo(a,b); }); X.stroke();
+      const [a,b]=P2(recent.at(-1)); ring(a,b,7,C.y,2);
     }
   };
-  draw(null);
-  const t0=performance.now(); let last=t0; const splits=[];
-  while(next<=total){
+  const draw=now=>{
+    clr();
+    if(!side) txt(st.next<=total?`Buscá el ${st.next}`:'¡Terminado!', areaW/2, oy-26, 18, C.mut);
+    for(let k=0;k<total;k++){
+      const c=k%n, r=Math.floor(k/n), x=ox+c*cell, y=oy+r*cell;
+      const fl=st.flash && st.flash.idx===k && now<st.flash.until, found=!reshuffle && st.foundIdx.has(k);
+      X.fillStyle = fl ? st.flash.color : found ? '#1f5f3a' : '#161b22'; X.fillRect(x+3,y+3,cell-6,cell-6);
+      txt(String(nums[k]), x+cell/2, y+cell/2, cell*0.38, found?'#a8e6c1':C.fg, 'center', 700);
+    }
+    if(side) drawPanel(now);
+  };
+  let running=true;
+  (async()=>{ while(running){ const now=await frame(); updGaze(now); draw(now); } })().catch(()=>{});
+  while(st.next<=total){
     const tap=await vtWait(null,true);
-    const c=Math.floor((tap.x-ox)/cell), r=Math.floor((tap.y-oy)/cell);
-    if(c<0||r<0||c>=n||r>=n) continue;
-    const idx=r*n+c;
-    if(nums[idx]===next){ splits.push(tap.t-last); last=tap.t; next++; if(reshuffle && next<=total) nums=shuffle(nums); draw(reshuffle?null:{idx,color:'#1d4d2b'}); }
-    else { errors++; draw({idx,color:'#5a1d1d'}); }
+    const idx=cellOf(tap.x,tap.y); if(idx<0) continue;
+    if(nums[idx]===st.next){
+      splits.push(tap.t-last); last=tap.t; st.found.push([st.next, Math.round(tap.t-VT.t0), idx]); st.foundIdx.add(idx); st.next++;
+      if(reshuffle && st.next<=total){ nums=shuffle(nums); st.layouts.push(nums.slice()); }
+      else st.flash={idx,color:'#2ea043',until:performance.now()+150};
+    } else { st.errors++; st.flash={idx,color:'#8b2b2b',until:performance.now()+250}; }
   }
-  const T=(last-t0)/1000;
-  clr(); txt('¡Terminado!',VT.W/2,VT.H/2,36,C.go,'center',700); await vtWait(700);
-  return mkRes('schulte',lv,{label:'Tiempo total',value:T,unit:'s',dec:1,better:'low'},[
-    ['Tiempo total',T,'s',1],['Errores',errors,'',0],['Tiempo medio por número',mean(splits)/1000,'s',2],['Número más lento',Math.max(...splits)/1000,'s',2]]);
+  await vtWait(500); running=false; await frame();
+  const T=(last-tStart)/1000, slowI=splits.indexOf(Math.max(...splits));
+  const metrics=[['Tiempo total',T,'s',1],['Errores',st.errors,'',0],['Tiempo medio por número',mean(splits)/1000,'s',2],
+    ['Número más lento',Math.max(...splits)/1000,'s',2],['Cuál fue el más lento',`N° ${slowI+1}`,'',0]];
+  const sd={ n, reshuffle, layouts: reshuffle ? st.layouts : [st.layouts[0]], geo:{ox:Math.round(ox),oy:Math.round(oy),size:Math.round(size)}, t0:Math.round(tStart-VT.t0), found:st.found };
+  if(VT.useGaze){
+    const A=schulteAnalysis(sd, VT.gaze.filter(s=>s.valid && s.t>=tStart && s.t<=last+200).map(s=>({t:s.t-VT.t0,x:s.x,y:s.y})));
+    Object.assign(sd, { dwell:A.dwell, perNum:A.perNum });
+    metrics.push(['Fijaciones por número',A.fixPerNum,'',1],['Vistos sin reconocer',A.seen,'',0],['Re-visitas a números ya encontrados',A.revis,'',0],
+      ['Estrategia de búsqueda',A.strategy,'',0],['Saltos a casilleros vecinos',A.adjPct,'%',0],['Mirada dentro de la tabla',A.inGrid,'%',0]);
+  }
+  return mkRes('schulte',lv,{label:'Tiempo total',value:T,unit:'s',dec:1,better:'low'},metrics,{schulte:sd});
+}
+
+/* análisis de la búsqueda visual en la Tabla de Schulte (tiempos relativos a VT.t0) */
+function schulteAnalysis(sd, samples){
+  const {n, geo, found, layouts, reshuffle}=sd, total=n*n, cell=geo.size/n;
+  const cellOf=(x,y)=>{ const c=Math.floor((x-geo.ox)/cell), r=Math.floor((y-geo.oy)/cell); return (c<0||r<0||c>=n||r>=n)?-1:r*n+c; };
+  const dwell=Array(total).fill(0); let inG=0;
+  for(let i=0;i<samples.length;i++){ const k=cellOf(samples[i].x,samples[i].y); if(k>=0){ inG++; if(i) dwell[k]+=Math.min(100,samples[i].t-samples[i-1].t); } }
+  const fx=fixations(samples.map(s=>({t:s.t,x:s.x,y:s.y,u:0,v:0,vt:s.t/1000,valid:true}))).map(f=>({ s:f.vt*1000, e:f.vt*1000+f.dur, k:cellOf(f.x,f.y) }));
+  const perNum=[]; let seenN=0, revisN=0;
+  for(let m=1;m<=found.length;m++){
+    const tm=found[m-1][1], prev=m===1?sd.t0:found[m-2][1], lay=layouts[reshuffle?m-1:0], tgt=found[m-1][2];
+    const win=fx.filter(f=>f.s>=prev && f.s<tm);
+    let seen=false;
+    win.forEach((f,i)=>{ if(f.k===tgt && f.e<tm-300 && win.slice(i+1).some(g=>g.k!==tgt)) seen=true; });
+    const revis=reshuffle?0:win.filter(f=>f.k>=0 && lay[f.k]<m).length;
+    if(seen) seenN++; revisN+=revis;
+    perNum.push([m, Math.round(tm-prev), win.length, seen?1:0, revis]);
+  }
+  let adj=0, pairs=0;
+  const g=fx.filter(f=>f.k>=0);
+  for(let i=1;i<g.length;i++){ if(g[i].k===g[i-1].k) continue; pairs++; const a=g[i].k, b=g[i-1].k; if(Math.max(Math.abs(a%n-b%n),Math.abs(Math.floor(a/n)-Math.floor(b/n)))===1) adj++; }
+  const adjPct=pairs?100*adj/pairs:null;
+  const strategy = adjPct==null ? '—' : adjPct>=60 ? 'Sistemática (barrido)' : adjPct>=40 ? 'Mixta' : 'Dispersa (saltos largos)';
+  return { dwell:dwell.map(Math.round), perNum, seen:seenN, revis:revisN, adjPct, strategy,
+    fixPerNum: perNum.length ? mean(perNum.map(p=>p[2])) : null, inGrid: samples.length?100*inG/samples.length:null };
+}
+function infernoColor(v){
+  const st=[[0,[20,11,52]],[.25,[87,16,110]],[.5,[188,55,84]],[.75,[249,142,9]],[1,[252,255,164]]];
+  for(let i=1;i<st.length;i++) if(v<=st[i][0]){ const [a,ca]=st[i-1], [b,cb]=st[i], t=(v-a)/(b-a); return ca.map((c,j)=>Math.round(c+(cb[j]-c)*t)); }
+  return st.at(-1)[1];
+}
+/* vista "por casillero" en el visor (acumulada hasta el instante t) */
+function drawSchulteCells(X2, W, H, r, t, pts, s){
+  const sd=r.detail.schulte, g=r.gazeRec, sx=W/g.W, sy=H/g.H, n=sd.n, total=n*n, cell=sd.geo.size/n;
+  X2.fillStyle='#0b0f14'; X2.fillRect(0,0,W,H);
+  const cellOf=(x,y)=>{ const c=Math.floor((x-sd.geo.ox)/cell), q=Math.floor((y-sd.geo.oy)/cell); return (c<0||q<0||c>=n||q>=n)?-1:q*n+c; };
+  const dw=Array(total).fill(0); let prev=null;
+  for(const p of pts){ if(p.t>t) break; const k=cellOf(p.x,p.y); if(prev && k>=0) dw[k]+=Math.min(100,p.t-prev.t); prev=p; }
+  const mx=Math.max(...dw,1e-9), nFound=sd.found.filter(f=>f[1]<=t).length, lay=sd.layouts[sd.reshuffle?Math.min(nFound,sd.layouts.length-1):0];
+  const foundIdx=new Set(sd.reshuffle?[]:sd.found.filter(f=>f[1]<=t).map(f=>f[2]));
+  for(let k=0;k<total;k++){
+    const c=k%n, q=Math.floor(k/n), x=(sd.geo.ox+c*cell)*sx, y=(sd.geo.oy+q*cell)*sy, w=cell*sx, h=cell*sy, v=dw[k]/mx, [R,G,B]=infernoColor(v);
+    X2.fillStyle=`rgb(${R},${G},${B})`; X2.fillRect(x+1.5*s,y+1.5*s,w-3*s,h-3*s);
+    if(foundIdx.has(k)){ X2.strokeStyle='#2ea043'; X2.lineWidth=3*s; X2.strokeRect(x+3*s,y+3*s,w-6*s,h-6*s); }
+    if(nFound<sd.found.length && lay[k]===nFound+1){ X2.strokeStyle='#ffd33d'; X2.lineWidth=3*s; X2.strokeRect(x+3*s,y+3*s,w-6*s,h-6*s); }
+    X2.fillStyle=v>0.6?'#111':'#fff'; X2.font=`700 ${Math.min(w,h)*0.32}px ${FONT}`; X2.textAlign='center'; X2.textBaseline='middle'; X2.fillText(String(lay[k]),x+w/2,y+h/2);
+  }
+  const rec=pts.filter(p=>p.t<=t && p.t>=t-2500);
+  if(rec.length>1){ X2.strokeStyle='rgba(255,211,61,.9)'; X2.lineWidth=2.5*s; X2.beginPath(); rec.forEach((p,i)=>{ i?X2.lineTo(p.x*sx,p.y*sy):X2.moveTo(p.x*sx,p.y*sy); }); X2.stroke();
+    const l=rec.at(-1); X2.beginPath(); X2.arc(l.x*sx,l.y*sy,9*s,0,7); X2.stroke(); }
+  // panel
+  const t0=sd.t0, el=Math.max(0,t-t0)/1000, lastFound=nFound?sd.found[nFound-1][1]:t0, nFix=g.fix.filter(f=>f.t>=t0 && f.t<=t).length;
+  const rows=[['Tiempo',`${el.toFixed(1)} s`],['Objetivo',nFound<sd.found.length?String(nFound+1):'—'],['Encontrados',`${nFound} / ${total}`],['Fijaciones',String(nFix)],['Buscando hace',`${(Math.max(0,t-lastFound)/1000).toFixed(1)} s`]];
+  const bw=170*s, bh=(rows.length*20+14)*s; X2.fillStyle='rgba(13,17,23,.85)'; X2.fillRect(8*s,8*s,bw,bh);
+  X2.textAlign='left'; X2.textBaseline='middle';
+  rows.forEach(([l,v],i)=>{ const y=(22+i*20)*s; X2.fillStyle='#8b949e'; X2.font=`600 ${11*s}px ${FONT}`; X2.fillText(l.toUpperCase(),16*s,y); X2.fillStyle=i===4?'#ffd33d':'#e6edf3'; X2.font=`700 ${13*s}px ${FONT}`; X2.fillText(v,110*s,y); });
+}
+function schulteCellImg(r){
+  const g=r.gazeRec, W=720, H=Math.round(720*g.H/g.W), c=document.createElement('canvas'); c.width=W; c.height=H;
+  const pts=g.s.map(a=>({t:a[0],x:a[1],y:a[2]}));
+  drawSchulteCells(c.getContext('2d'), W, H, r, 1e12, pts.map(p=>({...p})), W/g.W*1.6);
+  // sin recorrido de 2,5 s ni panel de tiempo para la imagen final: se redibuja limpia
+  const x=c.getContext('2d'), sd=r.detail.schulte, n=sd.n, sx=W/g.W, sy=H/g.H, cell=sd.geo.size/n, total=n*n, mx=Math.max(...sd.dwell,1e-9);
+  x.fillStyle='#0b0f14'; x.fillRect(0,0,W,H);
+  const lay=sd.layouts[0];
+  for(let k=0;k<total;k++){ const cc=k%n, q=Math.floor(k/n), X0=(sd.geo.ox+cc*cell)*sx, Y0=(sd.geo.oy+q*cell)*sy, w=cell*sx, h=cell*sy, v=sd.dwell[k]/mx, [R,G,B]=infernoColor(v);
+    x.fillStyle=`rgb(${R},${G},${B})`; x.fillRect(X0+2,Y0+2,w-4,h-4); x.fillStyle=v>0.6?'#111':'#fff'; x.font=`700 ${Math.min(w,h)*0.32}px Helvetica,Arial,sans-serif`; x.textAlign='center'; x.textBaseline='middle';
+    x.fillText(sd.reshuffle?'':String(lay[k]),X0+w/2,Y0+h/2); }
+  return c.toDataURL('image/jpeg',.9);
 }
 
 /* ---------- 5. Seguimiento múltiple de objetos (MOT) ---------- */
@@ -1184,7 +1306,7 @@ const TESTS = {
   react:   { name:'Tiempo de reacción', area:'Velocidad de reacción', fn:tReact, desc:'Respuesta lo más rápida posible a un estímulo visual central.' },
   gonogo:  { name:'Go / No-Go', area:'Concentración e inhibición', fn:tGoNoGo, desc:'Responder al verde e inhibir la respuesta al rojo. Mide atención sostenida y control de impulsos.' },
   periph:  { name:'Visión periférica', area:'Campo visual periférico', fn:tPeriph, desc:'Detectar destellos en 8 direcciones y 3 distancias (parafoveal, periferia media y lejana) sin mover los ojos del centro.' },
-  schulte: { name:'Tabla de Schulte', area:'Atención y búsqueda visual', fn:tSchulte, desc:'Encontrar números en orden lo más rápido posible usando la visión periférica.' },
+  schulte: { name:'Tabla de Schulte', area:'Atención y búsqueda visual', fn:tSchulte, levels:4, levelNames:['4x4','5x5','6x6','6x6 mezcla'], desc:'Encontrar los números en orden ascendente lo más rápido posible. Con mirada: mapa de calor por casillero, fijaciones por número, números vistos sin reconocer y estrategia de búsqueda.' },
   mot:     { name:'Seguimiento múltiple (MOT)', area:'Atención dividida', fn:tMOT, desc:'Seguir varias pelotas en movimiento a la vez, como compañeros y rivales en el campo.' },
   eyehand: { name:'Coordinación ojo-mano', area:'Coordinación visomotora', fn:tEyeHand, desc:'Tocar objetivos que aparecen en lugares aleatorios, lo más rápido y preciso posible.' },
   eyedom:  { name:'Ojo dominante', area:'Dominancia ocular', fn:tEyeDom, noLevels:true, noGaze:true, desc:'Determina el ojo dominante con los métodos de Miles o Porta (3 repeticiones) y detecta dominancia cruzada ojo-mano. El evaluador marca las respuestas.' },
@@ -1228,10 +1350,11 @@ function stopRec(R){
 }
 function takeSnap(){
   try {
-    if(VT.snaps.length>=40) return;
-    const w=480, h=Math.round(480*VT.H/VT.W), c=document.createElement('canvas'); c.width=w; c.height=h;
+    if(VT.snaps.length>=900) return;
+    const w=Math.min(420, Math.round(VT.W)), h=Math.round(w*VT.H/VT.W);
+    const c=VT.snapCanvas||(VT.snapCanvas=document.createElement('canvas')); if(c.width!==w||c.height!==h){ c.width=w; c.height=h; }
     c.getContext('2d').drawImage(vtc,0,0,w,h);
-    VT.snaps.push({ t:performance.now()-VT.t0, url:c.toDataURL('image/jpeg',.7) });
+    VT.snaps.push({ t:performance.now()-VT.t0, url:c.toDataURL('image/jpeg',.6) });
   } catch(e){}
 }
 function buildGazeRec(dur){
@@ -1282,7 +1405,7 @@ async function runVisionTest(key){
     if(ps.length>=8){ let dx=median(ps.map(p=>p.x))-VT.W/2, dy=median(ps.map(p=>p.y))-VT.H/2; const m=Math.hypot(dx,dy), lim=180; if(m>lim){ dx*=lim/m; dy*=lim/m; } S.offset={x:dx,y:dy}; }
   }
   VT.t0=performance.now();
-  if(VT.useGaze){ S.mode='vt'; R=startRec(); VT.t0=performance.now(); snapTimer=setInterval(takeSnap,2500); }
+  if(VT.useGaze){ S.mode='vt'; R=startRec(); VT.t0=performance.now(); snapTimer=setInterval(takeSnap,250); }
   const lv=S.levels[key]||1;
   let view=null;
   try {
@@ -1294,7 +1417,9 @@ async function runVisionTest(key){
       const url=await stopRec(R); R=null;
       res.gazeRec=buildGazeRec(dur);
       const snap=VT.snaps.length ? VT.snaps.reduce((b,s)=>Math.abs(s.t-dur/2)<Math.abs(b.t-dur/2)?s:b).url : null;
-      S.testMedia[res.id]={ videoUrl:url, snap };
+      S.testMedia[res.id]={ videoUrl:url, snap, frames:VT.snaps.slice() };
+      const ids=Object.keys(S.testMedia).filter(k=>S.testMedia[k].frames && S.testMedia[k].frames.length);
+      ids.slice(0,Math.max(0,ids.length-10)).forEach(k=>{ S.testMedia[k].frames=[]; }); // memoria: cuadros solo de los últimos 10 tests
     }
     const prev=prevResult(res);
     S.tests.push(res); saveTests();
@@ -1321,6 +1446,7 @@ async function showSummary(r, prev){
   const lh=Math.min(30, Math.max(22, (VT.H-y-120)/rows.length));
   rows.forEach(([l,v,u,d])=>{ txt(l, cx-14, y, 17, C.mut, 'right', 500); txt(fmtV(v,u,d), cx+14, y, 17, C.fg, 'left', 600); y+=lh; });
   if(!g){ txt('Tocá para cerrar', cx, VT.H-44, 18, C.acc, 'center', 700); await vtWait(null,true); return 'close'; }
+  if(!g.s.length) txt('Atención: la cámara no detectó los ojos durante el test', cx, VT.H-112, 16, C.warn, 'center', 600);
   const bw=Math.min(260,(VT.W-60)/2), bh=56, by=VT.H-bh-28, b1={x:cx-bw-8,y:by,w:bw,h:bh}, b2={x:cx+8,y:by,w:bw,h:bh};
   const btn=(b,label,col)=>{ X.fillStyle=col; X.beginPath(); X.roundRect ? X.roundRect(b.x,b.y,b.w,b.h,12) : X.rect(b.x,b.y,b.w,b.h); X.fill(); txt(label,b.x+b.w/2,b.y+b.h/2,17,'#fff','center',700); };
   btn(b1,'Ver movimiento ocular',C.acc); btn(b2,'Cerrar','#30363d');
@@ -1333,15 +1459,23 @@ const tvv=$('tvVideo'), tvc=$('tvCanvas'), tvx=tvc.getContext('2d'), trc=$('tvTr
 const TV={ r:null, media:{}, pts:[], t:0, playing:false, last:0, mode:'replay', heat:null, seeking:false, img:null, from:'tests' };
 function openTestView(r){
   const g=r.gazeRec; if(!g) return;
-  TV.r=r; TV.media=S.testMedia[r.id]||{}; TV.t=0; TV.playing=false; TV.heat=null; TV.img=null; TV.from=S.tab;
+  TV.r=r; TV.media=S.testMedia[r.id]||{}; TV.frames=[]; TV.t=0; TV.playing=false; TV.heat=null; TV.img=null; TV.from=S.tab;
   TV.pts=g.s.map(a=>({ t:a[0], x:a[1], y:a[2], u:a[1]/g.W, v:a[2]/g.H, h:a[3], vv:a[4] }));
   $('tvWrap').style.aspectRatio=`${g.W}/${g.H}`;
   if(TV.media.videoUrl){ tvv.style.display='block'; tvv.src=TV.media.videoUrl; tvv.load(); $('tvNoVideo').style.display='none'; }
-  else { tvv.pause(); tvv.removeAttribute('src'); tvv.style.display='none'; $('tvNoVideo').style.display='block';
-    if(TV.media.snap){ const im=new Image(); im.onload=()=>{ TV.img=im; }; im.src=TV.media.snap; } }
+  else { tvv.pause(); tvv.removeAttribute('src'); tvv.style.display='none';
+    TV.frames=(TV.media.frames||[]).map(fr=>({ t:fr.t, url:fr.url, im:null }));
+    TV.frames.forEach(fr=>{ const im=new Image(); im.onload=()=>{ fr.im=im; }; im.src=fr.url; });
+    if(!TV.frames.length && TV.media.snap){ const im=new Image(); im.onload=()=>{ TV.img=im; }; im.src=TV.media.snap; } }
+  const nPts=g.s.length;
+  const note = !nPts ? '<span class="badc">No se registraron puntos de mirada en este test: la cámara no detectó los ojos (revisá luz, distancia y que la cara se vea completa), o la trayectoria se borró por falta de espacio.</span>'
+    : TV.media.videoUrl ? '' : (TV.frames&&TV.frames.length) ? '' : 'No hay imagen de la pantalla para este test (es de una sesión anterior). Se muestra solo la mirada.';
+  $('tvNoVideo').innerHTML=note; $('tvNoVideo').style.display = note ? 'block' : 'none';
   $('tvTitle').textContent=`${r.athlete} · ${r.name}`;
   $('tvSub').textContent=`${new Date(r.date).toLocaleString('es-AR')} · nivel ${r.level}`+(g.trimmed?' · trayectoria eliminada por falta de espacio':'');
-  setTvMode('replay'); renderTvMetrics();
+  const hasCells=!!(r.key==='schulte' && r.detail && r.detail.schulte && r.detail.schulte.dwell);
+  $('tvCellsBtn').style.display=hasCells?'':'none';
+  setTvMode(hasCells?'cells':'replay'); renderTvMetrics();
   $('home').style.display='none'; $('analysis').style.display='none'; $('tview').style.display='block'; scrollTo(0,0);
   requestAnimationFrame(tvLoop);
 }
@@ -1376,7 +1510,10 @@ function tvDraw(){
   tvx.clearRect(0,0,W,H);
   if(!TV.media.videoUrl){
     tvx.fillStyle='#0b0f14'; tvx.fillRect(0,0,W,H);
-    if(TV.img){ tvx.globalAlpha=.35; tvx.drawImage(TV.img,0,0,W,H); tvx.globalAlpha=1; }
+    let bg=null;
+    if(TV.frames && TV.frames.length){ for(const fr of TV.frames){ if(fr.t<=TV.t+1){ if(fr.im) bg=fr.im; } else break; } if(!bg) bg=(TV.frames.find(fr=>fr.im)||{}).im; }
+    if(bg){ tvx.globalAlpha = TV.mode==='replay' ? 1 : .55; tvx.drawImage(bg,0,0,W,H); tvx.globalAlpha=1; }
+    else if(TV.img){ tvx.globalAlpha=.35; tvx.drawImage(TV.img,0,0,W,H); tvx.globalAlpha=1; }
   }
   if(TV.mode==='replay'){
     const pts=TV.pts.filter(p=>p.t<=TV.t && p.t>=TV.t-600);
@@ -1391,7 +1528,8 @@ function tvDraw(){
   } else if(TV.mode==='heat'){
     if(!TV.heat) TV.heat=buildHeat(TV.pts, W, H);
     tvx.drawImage(TV.heat.c,0,0,W,H);
-  } else renderPath(tvx, r, TV.r.gazeRec.fix, d);
+  } else if(TV.mode==='cells') drawSchulteCells(tvx, W, H, TV.r, TV.t, TV.pts, Math.max(d, W/TV.r.gazeRec.W));
+  else renderPath(tvx, r, TV.r.gazeRec.fix, d);
 }
 function drawTrace(X2, c, pts, dur, cursor, dark){
   if(c) fitCanvas(c);
@@ -1421,6 +1559,12 @@ function renderTvMetrics(){
     r.metrics.map(([l,v,u,d])=>kpi(fmtV(v,u,d),l)).join('')+'</div>';
   h+=`<div style="font-weight:600;margin:6px 0 8px">Mirada durante el test</div><div class="kpis">`+
     g.m.map(([l,v,u,d])=>kpi(fmtV(v,u,d),l)).join('')+'</div>';
+  const sd=r.detail&&r.detail.schulte;
+  if(sd && sd.perNum && sd.perNum.length){
+    const pn=sd.perNum, mxT=Math.max(...pn.map(p=>p[1]));
+    h+=`<div style="font-weight:600;margin:14px 0 6px">Búsqueda número por número</div><div class="sub">Barra = tiempo de búsqueda · 👁 = lo miró antes de encontrarlo y siguió de largo · ↺ = re-visitas a números ya encontrados</div><div class="tblwrap"><table><tr><th>N°</th><th>Tiempo</th><th style="width:40%"></th><th>Fijaciones</th><th>Visto</th><th>Re-visitas</th></tr>`+
+      pn.map(p=>`<tr><td><b>${p[0]}</b></td><td>${(p[1]/1000).toFixed(2)} s</td><td><div style="height:8px;border-radius:4px;background:${p[1]===mxT?'#f85149':'#1f6feb'};width:${Math.max(3,100*p[1]/mxT)}%"></div></td><td>${p[2]}</td><td>${p[3]?'👁':''}</td><td>${p[4]?'↺ '+p[4]:''}</td></tr>`).join('')+'</table></div>';
+  }
   h+=`<div class="status">Los grados son aproximados (iPad a ~50 cm). Error de calibración en este test: ${g.calErr!=null?Math.round(g.calErr)+' px':'—'}.</div>`;
   $('tvMetrics').innerHTML=h;
 }
@@ -1431,7 +1575,7 @@ function renderTestCards(){
     const blocked=T.needsGaze && !S.model;
     return `<div class="tcard"><div class="tarea">${esc(T.area)}</div><h3>${esc(T.name)}</h3><p class="sub">${esc(T.desc)}</p>
       ${T.needsGaze?`<div class="sub ${blocked?'warnc':'ok'}">${blocked?'Requiere cámara y calibración':'Usa seguimiento ocular'}</div>`:''}
-      ${T.noLevels?'':`<div class="lv" data-k="${k}">${[1,2,3].map(n=>`<button class="${n===lv?'on':''}" data-n="${n}">Nivel ${n}</button>`).join('')}</div>`}
+      ${T.noLevels?'':`<div class="lv" data-k="${k}">${[...Array(T.levels||3)].map((_,i)=>i+1).map(n=>`<button class="${n===lv?'on':''}" data-n="${n}">${T.levelNames?T.levelNames[n-1]:'Nivel '+n}</button>`).join('')}</div>`}
       <div class="sub">${last?`Último: <b style="color:var(--tx)">${fmtV(last.main.value,last.main.unit,last.main.dec)}</b> · ${new Date(last.date).toLocaleDateString('es-AR')}${lvTxt}`:'Sin resultados para este jugador'}</div>
       <button class="go tstart" data-k="${k}" ${blocked?'disabled':''}>Empezar</button></div>`;
   }).join('');
@@ -1659,6 +1803,18 @@ async function makePDF(){
             y+=Math.max(ih,th+8)+8;
           }
         }
+        const sdp=r.detail&&r.detail.schulte;
+        if(sdp && sdp.dwell && r.gazeRec){
+          const g=r.gazeRec, iw=CW*0.48, ih=iw*g.H/g.W;
+          y+=4; ensure(ih+14); font(9.5,'bold',[87,96,106]); doc.text('Mapa de calor por casillero (permanencia de la mirada)',M,y); y+=3;
+          doc.addImage(schulteCellImg(r),'JPEG',M,y,iw,ih);
+          const pn=sdp.perNum||[], slow=[...pn].sort((a,b)=>b[1]-a[1]).slice(0,5), seen=pn.filter(p=>p[3]).map(p=>p[0]);
+          let ty=y+4; const tx=M+iw+6, tw=CW-iw-6; font(9,'bold'); doc.text('Números más lentos',tx,ty); ty+=5; font(9,'normal',[36,41,47]);
+          slow.forEach(p=>{ doc.text(clean(`N° ${p[0]}: ${(p[1]/1000).toFixed(2)} s · ${p[2]} fijaciones${p[3]?' · visto sin reconocer':''}`),tx,ty); ty+=4.6; });
+          ty+=3; font(9,'bold'); doc.text('Vistos sin reconocer',tx,ty); ty+=5; font(9,'normal',[36,41,47]);
+          doc.text(doc.splitTextToSize(clean(seen.length?seen.map(x=>'N° '+x).join(', '):'Ninguno'),tw),tx,ty);
+          y+=ih+8;
+        }
         if(k==='periph' && r.detail && r.detail.byDir){
           ensure(72); font(9,'bold',[87,96,106]); doc.text('Detección por dirección',M,y); y+=2;
           doc.addImage(radarImg(r.detail.byDir),'PNG',M+CW/2-35,y,70,70); y+=74;
@@ -1712,6 +1868,7 @@ async function makePDF(){
 
 refreshButtons();
 window.TrakEye = { S, VT }; // acceso para diagnóstico desde la consola
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
